@@ -4,6 +4,7 @@ import {
   dividerParagraph,
   spacerParagraph,
   getStyles,
+  BULLET_NUMBERING,
 } from "../core/index.js";
 
 /**
@@ -92,7 +93,11 @@ export function Bullet(
   text: string,
   styles?: ResumeStyles,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).bullet, text, { bullet: true })];
+  return () => [
+    paragraphFromToken(getStyles(styles).bullet, text, {
+      numbering: { reference: BULLET_NUMBERING, level: 0 },
+    }),
+  ];
 }
 
 /**
@@ -112,7 +117,11 @@ export function BulletList(
 
     for (const item of items) {
       if (typeof item === "string") {
-        paragraphs.push(paragraphFromToken(s.bullet, item, { bullet: true }));
+        paragraphs.push(
+          paragraphFromToken(s.bullet, item, {
+            numbering: { reference: BULLET_NUMBERING, level: 0 },
+          }),
+        );
       } else {
         paragraphs.push(...item());
       }
@@ -134,7 +143,7 @@ export function Divider(): SectionComponent {
 /**
  * Vertical spacing between sections.
  *
- * @param points - Space in twips (default 100).
+ * @param points - Space in twips (default 60).
  * @returns A section component producing a spacer paragraph.
  */
 export function Spacer(points?: number): SectionComponent {

@@ -346,7 +346,7 @@ describe("Styles System", () => {
     });
     expect(custom.heading.color).toBe("FF0000");
     expect(custom.heading.size).toBe(32);
-    expect(custom.heading.font).toBe("Calibri");
+    expect(custom.heading.font).toBe("Arial");
   });
 
   it("createStyles with no args returns defaults", () => {

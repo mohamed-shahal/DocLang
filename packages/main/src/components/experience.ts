@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   ExperienceItemConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, getStyles, Paragraph } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, getStyles, Paragraph, BULLET_NUMBERING } from "../core/index.js";
 
 /**
  * A section heading labeled "Experience".
@@ -71,7 +71,11 @@ export function ExperienceItem(
 
     // Bullet points
     for (const point of config.points) {
-      paragraphs.push(paragraphFromToken(s.bullet, point, { bullet: true }));
+      paragraphs.push(
+        paragraphFromToken(s.bullet, point, {
+          numbering: { reference: BULLET_NUMBERING, level: 0 },
+        }),
+      );
     }
 
     return paragraphs;

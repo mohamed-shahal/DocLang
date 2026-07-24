@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   ProjectConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Paragraph, TextRun } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Paragraph, TextRun, BULLET_NUMBERING } from "../core/index.js";
 
 /**
  * A projects section containing multiple project entries.
@@ -66,7 +66,11 @@ export function Project(
     // Bullet points
     if (config.points) {
       for (const point of config.points) {
-        paragraphs.push(paragraphFromToken(s.bullet, point, { bullet: true }));
+        paragraphs.push(
+          paragraphFromToken(s.bullet, point, {
+            numbering: { reference: BULLET_NUMBERING, level: 0 },
+          }),
+        );
       }
     }
 

@@ -124,6 +124,7 @@ export interface StyleToken {
   size?: number;
   bold?: boolean;
   italics?: boolean;
+  uppercase?: boolean;
   color?: string;
   spacing?: {
     before?: number;
@@ -131,6 +132,14 @@ export interface StyleToken {
     line?: number;
   };
   alignment?: "left" | "center" | "right";
+  border?: {
+    bottom?: {
+      style?: "single" | "double" | "thick" | "none";
+      size?: number;
+      color?: string;
+      space?: number;
+    };
+  };
 }
 
 /**

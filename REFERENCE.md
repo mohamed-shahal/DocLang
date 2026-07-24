@@ -846,10 +846,11 @@ Every token is a `StyleToken` with these optional fields:
 
 ```ts
 interface StyleToken {
-  font?: string;       // Font family (e.g. "Calibri", "Georgia")
+  font?: string;       // Font family (e.g. "Arial", "Georgia")
   size?: number;       // Font size in half-points (e.g. 24 = 12pt)
   bold?: boolean;      // Bold text
   italics?: boolean;   // Italic text
+  uppercase?: boolean; // Force uppercase text
   color?: string;      // Hex color without # (e.g. "FF0000")
   spacing?: {
     before?: number;   // Space before in twips
@@ -857,6 +858,14 @@ interface StyleToken {
     line?: number;     // Line spacing
   };
   alignment?: "left" | "center" | "right";
+  border?: {
+    bottom?: {
+      style?: "single" | "double" | "thick" | "none";
+      size?: number;   // Border thickness
+      color?: string;  // Border color
+      space?: number;  // Space between border and text
+    };
+  };
 }
 ```
 
@@ -1029,6 +1038,7 @@ interface StyleToken {
   size?: number;
   bold?: boolean;
   italics?: boolean;
+  uppercase?: boolean;
   color?: string;
   spacing?: {
     before?: number;
@@ -1036,6 +1046,14 @@ interface StyleToken {
     line?: number;
   };
   alignment?: "left" | "center" | "right";
+  border?: {
+    bottom?: {
+      style?: "single" | "double" | "thick" | "none";
+      size?: number;
+      color?: string;
+      space?: number;
+    };
+  };
 }
 ```
 

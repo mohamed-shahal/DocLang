@@ -4,6 +4,7 @@ import {
   TextRun,
   Document,
   convertInchesToTwip,
+  createBulletNumbering,
 } from "../core/index.js";
 
 /**
@@ -39,6 +40,20 @@ export function Resume(
   }
 
   return new Document({
+    numbering: {
+      config: createBulletNumbering(),
+    },
+    styles: {
+      default: {
+        document: {
+          run: {
+            font: "Arial",
+            size: 18,
+            color: "000000",
+          },
+        },
+      },
+    },
     sections: [
       {
         properties: {
