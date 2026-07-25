@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocLang — TypeScript Resume Builder</title>
-  <meta name="description" content="A TypeScript library for creating professional Microsoft Word resumes using semantic components.">
+  <title>DocLang — Document Builder for JavaScript</title>
+  <meta name="description" content="A TypeScript library for programmatically generating Microsoft Word documents using semantic components.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -421,9 +421,9 @@
 
   <!-- HERO -->
   <header class="hero">
-    <span class="hero-label">TypeScript &middot; Word Documents &middot; Resumes</span>
-    <h1>Build resumes that<br><span class="gradient">actually look professional</span></h1>
-    <p>A semantic component library for generating Microsoft Word resumes. No templates. No drag-and-drop. Just code that reads like a resume.</p>
+    <span class="hero-label">TypeScript &middot; Word Documents &middot; Programmatic</span>
+    <h1>Documents as code.<br><span class="gradient">No templates needed.</span></h1>
+    <p>A semantic component library for generating Microsoft Word documents from JavaScript. Build resumes, reports, letters, contracts — any structured document — with composable functions.</p>
     <div class="hero-actions">
       <button class="install-cmd" onclick="copyInstall()" aria-label="Copy install command">
         <span class="mono">npm install doclang</span>
@@ -440,34 +440,34 @@
   <section class="features" id="features">
     <div class="features-header">
       <p class="section-label">Why DocLang</p>
-      <h2 class="section-title">Resumes as code</h2>
+      <h2 class="section-title">Documents as code</h2>
       <p class="section-desc">Stop fighting with formatting. Describe the structure, get the document.</p>
     </div>
     <div class="features-grid">
       <div class="feature-card">
         <div class="feature-icon">📝</div>
         <h3>Semantic API</h3>
-        <p>Components read like resume sections: <code>Name()</code>, <code>Experience()</code>, <code>Skills()</code>. No layout code needed.</p>
+        <p>Components read like document sections: <code>Header()</code>, <code>Experience()</code>, <code>Summary()</code>. No layout code needed.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🎨</div>
         <h3>Built-in Design System</h3>
-        <p>Professional, ATS-friendly defaults out of the box. Arial typography, consistent spacing, proper hierarchy.</p>
+        <p>Professional defaults out of the box. Arial typography, consistent spacing, proper hierarchy. Override anything with themes.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">📄</div>
-        <h3>Word Documents</h3>
-        <p>Generates real <code>.docx</code> files using the docx standard. No PDF hacks, no HTML conversions.</p>
+        <h3>Real Word Documents</h3>
+        <p>Generates standard <code>.docx</code> files. No PDF hacks, no HTML conversions. Opens in Word, Google Docs, LibreOffice.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">⚡</div>
         <h3>One-Line Export</h3>
-        <p><code>exportFile()</code> saves your resume as DOCX or PDF with a single call. No boilerplate required.</p>
+        <p><code>exportFile()</code> saves your document as DOCX or PDF with a single call. No boilerplate required.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🧩</div>
-        <h3>12 Component Types</h3>
-        <p>Header, Experience, Education, Skills, Projects, Certifications, Languages, Awards, References, and more.</p>
+        <h3>Composable Components</h3>
+        <p>Header, Experience, Education, Skills, Projects, Certifications, Languages, Awards, References — mix and match freely.</p>
       </div>
       <div class="feature-card">
         <div class="feature-icon">🎯</div>
@@ -482,9 +482,9 @@
     <div class="code-section-inner">
       <div>
         <p class="section-label">Quick Start</p>
-        <h2 class="section-title">From zero to resume<br>in 30 seconds</h2>
+        <h2 class="section-title">From zero to document<br>in 30 seconds</h2>
         <p class="section-desc" style="margin-bottom: 24px;">
-          Import the components you need, describe your resume structure, and export. That's it.
+          Import the components you need, describe your document structure, and export. That's it.
         </p>
         <div style="display:flex;flex-direction:column;gap:16px;">
           <div style="background:var(--accent-light);border-radius:8px;padding:16px 20px;">
@@ -493,7 +493,7 @@
           </div>
           <div style="background:var(--accent-light);border-radius:8px;padding:16px 20px;">
             <p style="font-size:14px;font-weight:600;color:var(--accent-dark);margin-bottom:4px;">Export</p>
-            <code class="mono" style="font-size:13px;color:var(--text);">await exportFile(resume, { fileName: "resume" })</code>
+            <code class="mono" style="font-size:13px;color:var(--text);">await exportFile(document, { fileName: "output" })</code>
           </div>
         </div>
       </div>
@@ -552,8 +552,8 @@
   <section class="components" id="components">
     <div class="components-header">
       <p class="section-label">Components</p>
-      <h2 class="section-title">Every section, covered</h2>
-      <p class="section-desc">12 semantic components that map directly to resume sections. Each handles its own typography, spacing, and layout.</p>
+      <h2 class="section-title">Build any document</h2>
+      <p class="section-desc">Semantic components that map to document sections. Each handles its own typography, spacing, and layout. Compose them freely.</p>
     </div>
     <div class="comp-grid">
       <div class="comp-item">
@@ -562,15 +562,15 @@
       </div>
       <div class="comp-item">
         <span class="comp-name">Header()</span>
-        <span class="comp-desc">Name, title, contact, photo</span>
+        <span class="comp-desc">Title, contact, photo</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Summary()</span>
-        <span class="comp-desc">Professional summary</span>
+        <span class="comp-desc">Introductory text block</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Experience()</span>
-        <span class="comp-desc">Work history entries</span>
+        <span class="comp-desc">Entries with roles and details</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Education()</span>
@@ -578,27 +578,27 @@
       </div>
       <div class="comp-item">
         <span class="comp-name">Skills()</span>
-        <span class="comp-desc">Technical skills list</span>
+        <span class="comp-desc">Skills or tag lists</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Projects()</span>
-        <span class="comp-desc">Portfolio projects</span>
+        <span class="comp-desc">Project entries with details</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Certifications()</span>
-        <span class="comp-desc">Professional certifications</span>
+        <span class="comp-desc">Certifications and issuers</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Languages()</span>
-        <span class="comp-desc">Language proficiencies</span>
+        <span class="comp-desc">Languages and proficiency</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">Awards()</span>
-        <span class="comp-desc">Awards and honors</span>
+        <span class="comp-desc">Awards and recognitions</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">References()</span>
-        <span class="comp-desc">Professional references</span>
+        <span class="comp-desc">Contact references</span>
       </div>
       <div class="comp-item">
         <span class="comp-name">exportFile()</span>
@@ -643,7 +643,7 @@
     <div style="display:flex;gap:20px;">
       <a href="https://github.com/mohamed-shahal/DocLang" target="_blank" rel="noopener">GitHub</a>
       <a href="https://www.npmjs.com/package/doclang" target="_blank" rel="noopener">npm</a>
-      <a href="https://github.com/mohamed-shahal/DocLang/blob/main/REFERENCE.md" target="_blank" rel="noopener">API Reference</a>
+      <a href="https://github.com/mohamed-shahal/DocLang/blob/main/REFERENCE.md" target="_blank" rel="noopener">Reference</a>
     </div>
   </footer>
 
