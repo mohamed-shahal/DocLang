@@ -124,6 +124,7 @@ await exportFile(resume, { fileName: "john_doe", pdf: true });
 | `Contact(info)` | Contact line with pipe separators |
 | `Address(text)` | Address in small text |
 | `Photo(config)` | Photo image |
+| `PhotoPath(imagePath, config)` | Photo image loaded from a local file path |
 
 ### Profile
 

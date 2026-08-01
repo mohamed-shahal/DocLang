@@ -232,7 +232,7 @@ Components for the resume header (name, title, contact info).
 
 ### `Header(...children)`
 
-Container for all header content. Wraps Name, Designation, Contact, Address, and Photo components.
+Container for all header content. Wraps Name, Designation, Contact, Address, Photo, and PhotoPath components.
 
 ```ts
 function Header(...children: Array<SectionComponent | string>): SectionComponent
@@ -322,6 +322,26 @@ function Photo(config: PhotoConfig): SectionComponent
 ```ts
 Photo({
   data: fs.readFileSync("photo.jpg"),
+  width: 100,
+  height: 100,
+  circular: true
+})
+```
+
+---
+
+### `PhotoPath(imagePath, config)`
+
+A photo in the header loaded from a local file path.
+
+```ts
+function PhotoPath(imagePath: string, config: Omit<PhotoConfig, "data">): SectionComponent
+```
+
+**Example:**
+
+```ts
+PhotoPath("photo.jpg", {
   width: 100,
   height: 100,
   circular: true

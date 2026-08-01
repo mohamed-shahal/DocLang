@@ -37,6 +37,7 @@ export {
   Address,
   Photo,
 } from "./components/header.js";
+export { PhotoPath } from "./components/photo.js";
 
 // Profile
 export { Summary, Objective } from "./components/profile.js";

@@ -1,6 +1,6 @@
 {
   "name": "doclang",
-  "version": "1.0.0",
+  "version": "1.1.1",
   "description": "A TypeScript library for creating professional resumes using semantic components",
   "type": "module",
   "main": "./packages/main/dist/index.js",

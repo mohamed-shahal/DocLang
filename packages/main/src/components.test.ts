@@ -1,3 +1,6 @@
+import * as fs from "fs/promises";
+import * as os from "os";
+import * as path from "path";
 import { describe, it, expect } from "vitest";
 import { Packer } from "docx";
 import {
@@ -7,6 +10,7 @@ import {
   Designation,
   Contact,
   Address,
+  PhotoPath,
   Summary,
   Objective,
   Experience,
@@ -127,6 +131,31 @@ describe("Header Components", () => {
       Contact({ email: "a@b.com" })
     )();
     expect(result).toHaveLength(3);
+  });
+
+  it("PhotoPath returns a centered image paragraph from a file path", async () => {
+    const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "doclang-photo-"));
+    const imagePath = path.join(tempDir, "photo.png");
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1mX2kAAAAASUVORK5CYII=",
+      "base64"
+    );
+
+    await fs.writeFile(imagePath, png);
+
+    const result = PhotoPath(imagePath, { width: 80, height: 80 })();
+    expect(result).toHaveLength(1);
+
+    const doc = Resume(
+      Header(
+        Name("John Doe"),
+        PhotoPath(imagePath, { width: 80, height: 80 })
+      )
+    );
+
+    const buffer = await Packer.toBuffer(doc);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
   });
 });
 
