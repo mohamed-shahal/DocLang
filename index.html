@@ -1,510 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DocLang — Document Builder for JavaScript</title>
-  <meta name="description" content="A TypeScript library for programmatically generating Microsoft Word documents using semantic components.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>doclang(1) — Document Builder for JavaScript</title>
+<meta name="description" content="Generate Microsoft Word documents from JavaScript with DocLang, a semantic TypeScript component library.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    :root {
-      --bg: #FAFAFA;
-      --surface: #FFFFFF;
-      --text: #0F172A;
-      --text-secondary: #64748B;
-      --border: #E2E8F0;
-      --code-bg: #1E293B;
-      --code-text: #E2E8F0;
-      --accent: #6366F1;
-      --accent-light: #EEF2FF;
-      --accent-dark: #4F46E5;
-      --green: #10B981;
-      --radius: 8px;
-    }
+  :root {
+    --bg: #0a0f0a;
+    --bg-raise: #0e150e;
+    --line: #1c271d;
+    --line-strong: #2a3a2c;
+    --text: #c7ddc7;
+    --text-bright: #e8f4e8;
+    --dim: #5e7a61;
+    --accent: #37f06b;
+    --amber: #e5c170;
+    --cyan: #6fc3e0;
+    --red: #ff7a72;
+    --code-bg: #0b110c;
+  }
 
-    html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; }
 
-    body {
-      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-    }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', 'SF Mono', 'Menlo', 'Consolas', monospace;
+    font-size: 0.9375rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
 
-    code, pre, .mono {
-      font-family: 'JetBrains Mono', 'SF Mono', 'Fira Code', monospace;
-    }
+  ::selection { background: var(--accent); color: #06120a; }
 
-    a { color: var(--accent-dark); text-decoration: none; }
-    a:hover { text-decoration: underline; }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: var(--line-strong); border: 2px solid var(--bg); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--dim); }
 
-    /* NAV */
-    .nav {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: rgba(250, 250, 250, 0.85);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-      height: 56px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-brand {
-      font-weight: 700;
-      font-size: 18px;
-      color: var(--text);
-      letter-spacing: -0.3px;
-    }
-    .nav-brand span { color: var(--accent); }
-    .nav-links { display: flex; gap: 28px; align-items: center; }
-    .nav-links a {
-      font-size: 14px;
-      font-weight: 500;
-      color: var(--text-secondary);
-      transition: color 0.15s;
-    }
-    .nav-links a:hover { color: var(--text); text-decoration: none; }
-    .nav-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      background: var(--code-bg);
-      color: var(--code-text);
-      padding: 5px 12px;
-      border-radius: 20px;
-      font-size: 13px;
-      font-weight: 500;
-    }
-    .nav-badge::before {
-      content: '';
-      width: 7px;
-      height: 7px;
-      background: var(--green);
-      border-radius: 50%;
-    }
+  a { color: var(--cyan); text-decoration: none; }
+  a:hover { text-decoration: underline; text-underline-offset: 3px; }
+  a:focus-visible, button:focus-visible, [tabindex]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
 
-    /* HERO */
-    .hero {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 80px 24px 64px;
-      text-align: center;
-    }
-    .hero-label {
-      display: inline-block;
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
-      background: var(--accent-light);
-      padding: 4px 14px;
-      border-radius: 20px;
-      margin-bottom: 24px;
-      letter-spacing: 0.3px;
-    }
-    .hero h1 {
-      font-size: clamp(40px, 6vw, 64px);
-      font-weight: 700;
-      line-height: 1.1;
-      letter-spacing: -1.5px;
-      margin-bottom: 20px;
-    }
-    .hero h1 .gradient {
-      background: linear-gradient(135deg, var(--accent) 0%, #A855F7 50%, #EC4899 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero p {
-      font-size: 18px;
-      color: var(--text-secondary);
-      max-width: 560px;
-      margin: 0 auto 36px;
-      line-height: 1.7;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 12px;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .install-cmd {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      background: var(--code-bg);
-      color: var(--code-text);
-      padding: 12px 20px;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 500;
-      cursor: pointer;
-      transition: background 0.15s;
-      border: none;
-      font-family: inherit;
-    }
-    .install-cmd:hover { background: #334155; }
-    .install-cmd .copy-icon {
-      opacity: 0.5;
-      transition: opacity 0.15s;
-    }
-    .install-cmd:hover .copy-icon { opacity: 1; }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      background: var(--accent);
-      color: white;
-      padding: 12px 24px;
-      border-radius: var(--radius);
-      font-size: 15px;
-      font-weight: 600;
-      transition: background 0.15s;
-      border: none;
-      cursor: pointer;
-      font-family: inherit;
-    }
-    .btn-primary:hover { background: var(--accent-dark); text-decoration: none; color: white; }
+  strong { color: var(--text-bright); font-weight: 500; }
 
-    /* SECTION */
-    section {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 0 24px;
-    }
-    .section-label {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      margin-bottom: 12px;
-    }
-    .section-title {
-      font-size: 32px;
-      font-weight: 700;
-      letter-spacing: -0.8px;
-      margin-bottom: 12px;
-    }
-    .section-desc {
-      font-size: 16px;
-      color: var(--text-secondary);
-      max-width: 540px;
-      line-height: 1.7;
-    }
+  /* ==== TOP BAR ==== */
+  .termbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 44px;
+    padding: 0 20px;
+    background: var(--bg-raise);
+    border-bottom: 1px solid var(--line);
+  }
+  .dots { display: flex; gap: 7px; flex: none; }
+  .dots i { width: 11px; height: 11px; border-radius: 50%; display: block; }
+  .dots i:nth-child(1) { background: #e0524d; }
+  .dots i:nth-child(2) { background: #d9a441; }
+  .dots i:nth-child(3) { background: #3fae5a; }
+  .termbar .path { color: var(--dim); font-size: 0.8rem; white-space: nowrap; }
+  .termbar .path b { color: var(--accent); font-weight: 500; }
+  .nav { display: flex; gap: 18px; margin-left: auto; align-items: center; font-size: 0.8rem; }
+  .nav a { color: var(--dim); }
+  .nav a:hover { color: var(--text-bright); }
+  .ver {
+    font-size: 0.75rem;
+    color: var(--amber);
+    border: 1px solid var(--line-strong);
+    padding: 2px 8px;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+  .ver:hover { color: var(--amber); text-decoration: none; }
 
-    /* FEATURES */
-    .features {
-      padding: 80px 24px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .features-header {
-      text-align: center;
-      margin-bottom: 56px;
-    }
-    .features-header .section-desc { margin: 0 auto; }
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
-    }
-    .feature-card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 28px;
-      transition: border-color 0.2s, box-shadow 0.2s;
-    }
-    .feature-card:hover {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px var(--accent-light);
-    }
-    .feature-icon {
-      width: 40px;
-      height: 40px;
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      margin-bottom: 16px;
-      background: var(--accent-light);
-    }
-    .feature-card h3 {
-      font-size: 16px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .feature-card p {
-      font-size: 14px;
-      color: var(--text-secondary);
-      line-height: 1.6;
-    }
+  /* ==== LAYOUT ==== */
+  .shell {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 1fr);
+    max-width: 1080px;
+    margin: 0 auto;
+    gap: 40px;
+    padding: 40px 24px 80px;
+  }
 
-    /* CODE BLOCK */
-    .code-section {
-      padding: 80px 24px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .code-section-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 48px;
-      align-items: start;
-    }
-    .code-block {
-      background: var(--code-bg);
-      border-radius: 12px;
-      overflow: hidden;
-    }
-    .code-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 12px 20px;
-      border-bottom: 1px solid #334155;
-    }
-    .code-dots {
-      display: flex;
-      gap: 6px;
-    }
-    .code-dots span {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #475569;
-    }
-    .code-dots span:first-child { background: #EF4444; }
-    .code-dots span:nth-child(2) { background: #F59E0B; }
-    .code-dots span:nth-child(3) { background: #22C55E; }
-    .code-filename {
-      font-size: 12px;
-      color: #94A3B8;
-    }
-    pre {
-      padding: 20px;
-      overflow-x: auto;
-      font-size: 13.5px;
-      line-height: 1.7;
-      color: var(--code-text);
-    }
-    .kw { color: #C084FC; }
-    .fn { color: #67E8F9; }
-    .str { color: #86EFAC; }
-    .cm { color: #64748B; }
-    .op { color: #FDE68A; }
-    .num { color: #FCA5A5; }
-    .type { color: #7DD3FC; }
-    .prop { color: #FDA4AF; }
+  /* TOC */
+  .toc { position: sticky; top: 64px; align-self: start; font-size: 0.8rem; }
+  .toc-label { color: var(--dim); margin-bottom: 12px; }
+  .toc-label::before { content: "$ "; color: var(--accent); }
+  .tree { list-style: none; border-left: 1px solid var(--line-strong); padding-left: 16px; }
+  .tree li { position: relative; }
+  .tree li::before {
+    content: '';
+    position: absolute;
+    left: -17px;
+    top: 0.85em;
+    width: 12px;
+    height: 1px;
+    background: var(--line-strong);
+  }
+  .tree a { display: block; color: var(--dim); padding: 3px 0; }
+  .tree a:hover { color: var(--text-bright); text-decoration: none; }
+  .tree a.active { color: var(--accent); }
+  .toc-extra { margin-top: 24px; display: flex; flex-direction: column; gap: 8px; font-size: 0.8rem; }
+  .toc-extra a { color: var(--dim); }
+  .toc-extra a:hover { color: var(--text-bright); }
 
-    /* COMPONENTS */
-    .components {
-      padding: 80px 24px;
-      max-width: 1100px;
-      margin: 0 auto;
-    }
-    .components-header { margin-bottom: 48px; }
-    .comp-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px;
-    }
-    .comp-item {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-      padding: 14px 18px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      transition: border-color 0.15s;
-    }
-    .comp-item:hover { border-color: var(--accent); }
-    .comp-name {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--accent-dark);
-      white-space: nowrap;
-    }
-    .comp-desc {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
+  /* MAIN */
+  main { min-width: 0; }
+  section { margin-bottom: 64px; scroll-margin-top: 64px; }
 
-    /* CDN */
-    .cdn-section {
-      padding: 80px 24px;
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .cdn-inner {
-      max-width: 1100px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 48px;
-      align-items: start;
-    }
+  .sec-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .sec-head .tag { color: var(--amber); font-weight: 500; flex: none; }
+  .sec-head .rule { flex: 1; height: 1px; background: var(--line); }
 
-    /* FOOTER */
-    footer {
-      max-width: 1100px;
-      margin: 0 auto;
-      padding: 48px 24px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-top: 1px solid var(--border);
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-    footer a { color: var(--text-secondary); font-weight: 500; }
-    footer a:hover { color: var(--text); }
+  h2 { font-size: 1.15rem; color: var(--text-bright); font-weight: 700; margin-bottom: 16px; }
+  h2::before { content: "## "; color: var(--dim); font-weight: 400; }
+  h3 { font-size: 1rem; color: var(--text-bright); font-weight: 700; margin: 32px 0 12px; }
+  h3::before { content: "### "; color: var(--dim); font-weight: 400; }
+  p { margin-bottom: 16px; }
+  .dim { color: var(--dim); }
+  .lead { color: var(--text-bright); font-size: 1.05rem; }
 
-    /* RESPONSIVE */
-    @media (max-width: 768px) {
-      .features-grid { grid-template-columns: 1fr; }
-      .code-section-inner,
-      .cdn-inner { grid-template-columns: 1fr; }
-      .comp-grid { grid-template-columns: 1fr; }
-      .hero { padding: 56px 24px 48px; }
-      .nav-links .hide-mobile { display: none; }
-      footer { flex-direction: column; gap: 12px; text-align: center; }
-    }
+  ul.plain { list-style: none; margin-bottom: 16px; }
+  ul.plain li { padding-left: 20px; position: relative; margin-bottom: 4px; }
+  ul.plain li::before { content: "▸"; position: absolute; left: 0; color: var(--accent); }
+  ul.plain .k { color: var(--dim); display: inline-block; width: 8.5em; }
 
-    /* FOCUS */
-    :focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 2px;
-    }
+  /* command strips */
+  .cmdstrip {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    background: var(--bg-raise);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+  }
+  .cmdstrip .ps { color: var(--accent); flex: none; }
+  .cmdstrip code { color: var(--text-bright); font-size: 0.9rem; }
+  .copy {
+    margin-left: auto;
+    background: none;
+    border: 1px solid var(--line-strong);
+    color: var(--dim);
+    font-family: inherit;
+    font-size: 0.75rem;
+    padding: 3px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+    flex: none;
+  }
+  .copy:hover { color: var(--text-bright); border-color: var(--accent); }
+  .copy.copied { color: var(--accent); border-color: var(--accent); }
 
-    @media (prefers-reduced-motion: reduce) {
-      html { scroll-behavior: auto; }
-      *, *::before, *::after { transition-duration: 0.01ms !important; }
-    }
-  </style>
+  /* code blocks */
+  .file { color: var(--dim); font-size: 0.75rem; margin-bottom: 6px; }
+  pre.code {
+    background: var(--code-bg);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 18px 20px;
+    overflow-x: auto;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    margin: 0 0 16px;
+    color: var(--text);
+  }
+  pre.code .kw { color: var(--amber); }
+  pre.code .fn { color: var(--cyan); }
+  pre.code .str { color: var(--accent); }
+  pre.code .cm { color: var(--dim); font-style: italic; }
+  pre.code .op { color: var(--text-bright); }
+  pre.code .num { color: var(--red); }
+  pre.code .prop { color: var(--text-bright); }
+
+  /* terminal window (hero demo) */
+  .win {
+    background: var(--bg-raise);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    overflow: hidden;
+    margin-top: 20px;
+  }
+  .win-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--line);
+    background: var(--bg);
+  }
+  .win-title { color: var(--dim); font-size: 0.75rem; }
+  .win-body { padding: 18px 20px 22px; font-size: 0.85rem; }
+  .win-body .line { white-space: pre-wrap; }
+  .ps { color: var(--accent); }
+  .out { margin-top: 10px; }
+  .out .line { display: none; }
+  .out .o { color: var(--dim); }
+  .out .ok { color: var(--accent); }
+  .cursor {
+    display: inline-block;
+    width: 0.6em;
+    height: 1.05em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    animation: blink 1.1s steps(2, start) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+  pre.ascii {
+    margin-top: 14px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+    color: var(--text-bright);
+  }
+
+  /* tables */
+  .table-wrap { overflow-x: auto; margin-bottom: 20px; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  th, td { text-align: left; padding: 8px 12px; border: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--dim); font-weight: 500; background: var(--bg-raise); white-space: nowrap; }
+  td.fn { color: var(--cyan); white-space: nowrap; }
+  td.sig { color: var(--dim); white-space: nowrap; font-size: 0.8rem; }
+  tr:hover td { background: rgba(55, 240, 107, 0.04); }
+  .cat {
+    margin-top: 32px;
+    margin-bottom: 10px;
+    color: var(--amber);
+    font-weight: 500;
+    font-size: 0.85rem;
+  }
+  .cat::before { content: "# "; color: var(--dim); }
+
+  /* footer */
+  footer { border-top: 1px solid var(--line); padding: 28px 24px 44px; }
+  .foot-inner {
+    max-width: 1080px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    flex-wrap: wrap;
+    color: var(--dim);
+    font-size: 0.8rem;
+  }
+  .foot-inner a { color: var(--dim); }
+  .foot-inner a:hover { color: var(--text-bright); }
+  .exit { color: var(--accent); }
+
+  /* responsive */
+  @media (max-width: 860px) {
+    .shell { grid-template-columns: 1fr; padding: 24px 16px 60px; gap: 24px; }
+    .toc { display: none; }
+    .termbar .path { display: none; }
+  }
+  @media (max-width: 640px) {
+    .nav .hidel { display: none; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .cursor { animation: none; opacity: 0.6; }
+    *, *::before, *::after { transition-duration: 0.01ms !important; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav class="nav" role="navigation">
-    <div class="nav-inner">
-      <a href="#" class="nav-brand">Doc<span>Lang</span></a>
-      <div class="nav-links">
-        <a href="#features" class="hide-mobile">Features</a>
-        <a href="#quick-start" class="hide-mobile">Quick Start</a>
-        <a href="#components" class="hide-mobile">Components</a>
-        <a href="https://github.com/mohamed-shahal/DocLang" target="_blank" rel="noopener">GitHub</a>
-        <a href="https://www.npmjs.com/package/doclang" target="_blank" rel="noopener">
-          <span class="nav-badge">v1.1.0</span>
-        </a>
-      </div>
-    </div>
-  </nav>
-
-  <!-- HERO -->
-  <header class="hero">
-    <span class="hero-label">TypeScript &middot; Word Documents &middot; Programmatic</span>
-    <h1>Documents as code.<br><span class="gradient">No templates needed.</span></h1>
-    <p>A semantic component library for generating Microsoft Word documents from JavaScript. Build resumes, reports, letters, contracts — any structured document — with composable functions.</p>
-    <div class="hero-actions">
-      <button class="install-cmd" onclick="copyInstall()" aria-label="Copy install command">
-        <span class="mono">npm install doclang</span>
-        <svg class="copy-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
-      </button>
-      <a href="#quick-start" class="btn-primary">
-        Get Started
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+  <!-- TOP BAR -->
+  <header class="termbar">
+    <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="path"><b>~/</b>doclang <span class="dim">— zsh</span></div>
+    <nav class="nav" aria-label="Primary">
+      <a href="#name" class="hidel">Name</a>
+      <a href="#usage" class="hidel">Usage</a>
+      <a href="#components" class="hidel">Components</a>
+      <a href="#styles" class="hidel">Styles</a>
+      <a href="#api" class="hidel">API</a>
+      <a href="https://github.com/mohamed-shahal/DocLang" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://www.npmjs.com/package/doclang" target="_blank" rel="noopener">
+        <span class="ver">v1.1.0</span>
       </a>
-    </div>
+    </nav>
   </header>
 
-  <!-- FEATURES -->
-  <section class="features" id="features">
-    <div class="features-header">
-      <p class="section-label">Why DocLang</p>
-      <h2 class="section-title">Documents as code</h2>
-      <p class="section-desc">Stop fighting with formatting. Describe the structure, get the document.</p>
-    </div>
-    <div class="features-grid">
-      <div class="feature-card">
-        <div class="feature-icon">📝</div>
-        <h3>Semantic API</h3>
-        <p>Components read like document sections: <code>Header()</code>, <code>Experience()</code>, <code>Summary()</code>. No layout code needed.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🎨</div>
-        <h3>Built-in Design System</h3>
-        <p>Professional defaults out of the box. Arial typography, consistent spacing, proper hierarchy. Override anything with themes.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">📄</div>
-        <h3>Real Word Documents</h3>
-        <p>Generates standard <code>.docx</code> files. No PDF hacks, no HTML conversions. Opens in Word, Google Docs, LibreOffice.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">⚡</div>
-        <h3>One-Line Export</h3>
-        <p><code>exportFile()</code> saves your document as DOCX or PDF with a single call. No boilerplate required.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🧩</div>
-        <h3>Composable Components</h3>
-        <p>Header, Experience, Education, Skills, Projects, Certifications, Languages, Awards, References — mix and match freely.</p>
-      </div>
-      <div class="feature-card">
-        <div class="feature-icon">🎯</div>
-        <h3>Themeable</h3>
-        <p>Override any style token with <code>createStyles()</code>. Change fonts, colors, spacing — the API stays the same.</p>
-      </div>
-    </div>
-  </section>
+  <div class="shell">
 
-  <!-- QUICK START -->
-  <section class="code-section" id="quick-start">
-    <div class="code-section-inner">
-      <div>
-        <p class="section-label">Quick Start</p>
-        <h2 class="section-title">From zero to document<br>in 30 seconds</h2>
-        <p class="section-desc" style="margin-bottom: 24px;">
-          Import the components you need, describe your document structure, and export. That's it.
-        </p>
-        <div style="display:flex;flex-direction:column;gap:16px;">
-          <div style="background:var(--accent-light);border-radius:8px;padding:16px 20px;">
-            <p style="font-size:14px;font-weight:600;color:var(--accent-dark);margin-bottom:4px;">Install</p>
-            <code class="mono" style="font-size:13px;color:var(--text);">npm install doclang docx</code>
-          </div>
-          <div style="background:var(--accent-light);border-radius:8px;padding:16px 20px;">
-            <p style="font-size:14px;font-weight:600;color:var(--accent-dark);margin-bottom:4px;">Export</p>
-            <code class="mono" style="font-size:13px;color:var(--text);">await exportFile(document, { fileName: "output" })</code>
-          </div>
-        </div>
+    <!-- TOC -->
+    <aside class="toc">
+      <p class="toc-label">find docs -name "*.md"</p>
+      <ul class="tree">
+        <li><a href="#name">00-name.md</a></li>
+        <li><a href="#synopsis">01-synopsis.md</a></li>
+        <li><a href="#install">02-install.md</a></li>
+        <li><a href="#usage">03-usage.md</a></li>
+        <li><a href="#components">04-components.md</a></li>
+        <li><a href="#styles">05-styles.md</a></li>
+        <li><a href="#api">06-api.md</a></li>
+        <li><a href="https://github.com/mohamed-shahal/DocLang/blob/main/REFERENCE.md" target="_blank" rel="noopener">07-reference.md</a></li>
+      </ul>
+      <div class="toc-extra">
+        <a href="https://github.com/mohamed-shahal/DocLang" target="_blank" rel="noopener">github.com/mohamed-shahal/DocLang</a>
+        <a href="https://www.npmjs.com/package/doclang" target="_blank" rel="noopener">npmjs.com/package/doclang</a>
+        <span class="dim">MIT License</span>
       </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <span class="code-filename">generate.ts</span>
+    </aside>
+
+    <main>
+
+      <!-- NAME -->
+      <section id="name">
+        <div class="sec-head"><span class="tag">NAME</span><span class="rule"></span></div>
+        <p class="lead">doclang — generate Microsoft Word documents from JavaScript.</p>
+        <p>DocLang is a <strong>TypeScript library</strong> that builds professional <strong>.docx</strong> files from semantic components. Describe the structure of a resume — or any document — and DocLang handles typography, spacing, and layout. The output opens in Word, Google Docs, and LibreOffice.</p>
+        <ul class="plain">
+          <li><span class="k">language</span>TypeScript — ESM plus a browser bundle</li>
+          <li><span class="k">output</span>standard .docx, no HTML or PDF hacks</li>
+          <li><span class="k">peer dep</span>docx, used for packing</li>
+          <li><span class="k">license</span>MIT</li>
+        </ul>
+      </section>
+
+      <!-- SYNOPSIS -->
+      <section id="synopsis">
+        <div class="sec-head"><span class="tag">SYNOPSIS</span><span class="rule"></span></div>
+        <div class="cmdstrip">
+          <span class="ps">$</span>
+          <code>npm install doclang docx</code>
+          <button class="copy" data-copy="npm install doclang docx">copy</button>
         </div>
-<pre><span class="kw">import</span> {
-  <span class="fn">Resume</span>, <span class="fn">Header</span>, <span class="fn">Name</span>, <span class="fn">Designation</span>,
-  <span class="fn">Contact</span>, <span class="fn">Summary</span>, <span class="fn">Experience</span>, <span class="fn">ExperienceItem</span>,
+        <div class="cmdstrip">
+          <span class="ps">$</span>
+          <code>pnpm add doclang docx</code>
+          <button class="copy" data-copy="pnpm add doclang docx">copy</button>
+        </div>
+        <p class="dim">docx is a peer dependency used to pack the final document.</p>
+
+        <div class="win">
+          <div class="win-bar">
+            <div class="dots" aria-hidden="true"><i></i><i></i><i></i></div>
+            <span class="win-title">doclang-demo — node build.mjs</span>
+          </div>
+          <div class="win-body">
+            <div class="line"><span class="ps">$</span> <span id="typed"></span><span class="cursor"></span></div>
+            <div class="out" id="out">
+              <div class="line o">compiling resume …</div>
+              <div class="line ok">✓ docx generated in 42ms</div>
+              <div class="line ok">✓ exports/jane_smith.docx (18.2 kB)</div>
+              <pre class="ascii" id="preview" hidden></pre>
+            </div>
+            <div class="line" style="margin-top:12px;"><span class="ps">$</span><span class="cursor"></span></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INSTALL / CDN -->
+      <section id="install">
+        <div class="sec-head"><span class="tag">INSTALLATION</span><span class="rule"></span></div>
+        <h3>CDN</h3>
+        <p>Import DocLang without a build step. The browser bundle exposes everything on the global <code>DocLang</code>, with <code>Packer</code> on <code>DocLang.docx</code>.</p>
+        <div class="file">index.html</div>
+<pre class="code"><span class="cm">&lt;!-- index.html --&gt;</span>
+<span class="kw">&lt;script</span> src=<span class="str">"https://unpkg.com/doclang/dist/doclang.min.js"</span><span class="kw">&gt;&lt;/script&gt;</span>
+<span class="kw">&lt;script&gt;</span>
+  <span class="kw">const</span> { Resume, Header, Name } <span class="op">=</span> DocLang;
+  <span class="kw">const</span> { Packer } <span class="op">=</span> DocLang.docx;
+<span class="kw">&lt;/script&gt;</span></pre>
+        <p class="dim">See <a href="https://github.com/mohamed-shahal/DocLang/blob/main/README.md" target="_blank" rel="noopener">README.md</a> for the full CDN setup guide.</p>
+      </section>
+
+      <!-- USAGE -->
+      <section id="usage">
+        <div class="sec-head"><span class="tag">USAGE</span><span class="rule"></span></div>
+        <p>Compose a document from components, then hand it to <code>exportFile()</code>. Page margins default to 0.8in top/bottom and 1in left/right.</p>
+        <div class="file">build.mjs</div>
+<pre class="code"><span class="kw">import</span> {
+  <span class="fn">Resume</span>, <span class="fn">Header</span>, <span class="fn">Name</span>, <span class="fn">Designation</span>, <span class="fn">Contact</span>,
+  <span class="fn">Summary</span>, <span class="fn">Experience</span>, <span class="fn">ExperienceItem</span>,
   <span class="fn">Skills</span>, <span class="fn">Skill</span>, <span class="fn">Education</span>, <span class="fn">EducationItem</span>,
   <span class="fn">exportFile</span>,
 } <span class="kw">from</span> <span class="str">"doclang"</span>;
@@ -516,17 +409,15 @@
     <span class="fn">Contact</span>({
       <span class="prop">email</span>: <span class="str">"jane@example.com"</span>,
       <span class="prop">phone</span>: <span class="str">"+1 555 123 4567"</span>,
+      <span class="prop">github</span>: <span class="str">"github.com/janesmith"</span>,
     })
   ),
-  <span class="fn">Summary</span>(
-    <span class="str">"Full-stack engineer with 8+ years building "</span> <span class="op">+</span>
-    <span class="str">"scalable distributed systems."</span>
-  ),
+  <span class="fn">Summary</span>(<span class="str">"Full-stack engineer with 8+ years of experience."</span>),
   <span class="fn">Experience</span>(
     <span class="fn">ExperienceItem</span>({
       <span class="prop">company</span>: <span class="str">"Tech Corp"</span>,
       <span class="prop">designation</span>: <span class="str">"Senior Engineer"</span>,
-      <span class="prop">duration</span>: <span class="str">"2021 — Present"</span>,
+      <span class="prop">duration</span>: <span class="str">"2021 – Present"</span>,
       <span class="prop">points</span>: [
         <span class="str">"Led microservices migration"</span>,
         <span class="str">"Reduced deploy time by 70%"</span>,
@@ -535,7 +426,6 @@
   ),
   <span class="fn">Skills</span>(
     <span class="fn">Skill</span>(<span class="str">"TypeScript"</span>),
-    <span class="fn">Skill</span>(<span class="str">"React"</span>),
     <span class="fn">Skill</span>(<span class="str">"Node.js"</span>)
   )
 );
@@ -544,118 +434,367 @@
   <span class="prop">fileName</span>: <span class="str">"jane_smith"</span>,
   <span class="prop">pdf</span>: <span class="num">true</span>,
 });</pre>
-      </div>
-    </div>
-  </section>
+        <p class="dim">Run it and a <code>jane_smith.docx</code> (plus <code>.pdf</code> when requested) lands in <code>./exports</code>.</p>
+      </section>
 
-  <!-- COMPONENTS -->
-  <section class="components" id="components">
-    <div class="components-header">
-      <p class="section-label">Components</p>
-      <h2 class="section-title">Build any document</h2>
-      <p class="section-desc">Semantic components that map to document sections. Each handles its own typography, spacing, and layout. Compose them freely.</p>
-    </div>
-    <div class="comp-grid">
-      <div class="comp-item">
-        <span class="comp-name">Resume()</span>
-        <span class="comp-desc">Root document assembler</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Header()</span>
-        <span class="comp-desc">Title, contact, photo</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Summary()</span>
-        <span class="comp-desc">Introductory text block</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Experience()</span>
-        <span class="comp-desc">Entries with roles and details</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Education()</span>
-        <span class="comp-desc">Degrees and institutions</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Skills()</span>
-        <span class="comp-desc">Skills or tag lists</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Projects()</span>
-        <span class="comp-desc">Project entries with details</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Certifications()</span>
-        <span class="comp-desc">Certifications and issuers</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Languages()</span>
-        <span class="comp-desc">Languages and proficiency</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">Awards()</span>
-        <span class="comp-desc">Awards and recognitions</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">References()</span>
-        <span class="comp-desc">Contact references</span>
-      </div>
-      <div class="comp-item">
-        <span class="comp-name">exportFile()</span>
-        <span class="comp-desc">Save as DOCX or PDF</span>
-      </div>
-    </div>
-  </section>
+      <!-- COMPONENTS -->
+      <section id="components">
+        <div class="sec-head"><span class="tag">COMPONENTS</span><span class="rule"></span></div>
+        <p>Every component returns a <code>SectionComponent</code> — a function that produces paragraphs for the document body. Pass any component or a raw string into <code>Resume()</code> or a container. All accept an optional <code>ResumeStyles</code> override as the last argument.</p>
 
-  <!-- CDN -->
-  <section class="cdn-section" id="cdn">
-    <div class="cdn-inner">
-      <div>
-        <p class="section-label">CDN</p>
-        <h2 class="section-title">Use without npm</h2>
-        <p class="section-desc">Import directly from a CDN in any JavaScript project. No build step required.</p>
-      </div>
-      <div class="code-block">
-        <div class="code-header">
-          <div class="code-dots"><span></span><span></span><span></span></div>
-          <span class="code-filename">index.js</span>
+        <p class="cat">generic</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Heading</td><td class="sig">Heading(text, styles?)</td><td>Large heading paragraph.</td></tr>
+            <tr><td class="fn">SubHeading</td><td class="sig">SubHeading(text, styles?)</td><td>Sub-section title.</td></tr>
+            <tr><td class="fn">SectionHeading</td><td class="sig">SectionHeading(text, styles?)</td><td>Accent-colored section heading, used by containers.</td></tr>
+            <tr><td class="fn">Text</td><td class="sig">Text(text, styles?)</td><td>Normal paragraph.</td></tr>
+            <tr><td class="fn">SmallText</td><td class="sig">SmallText(text, styles?)</td><td>Secondary small text.</td></tr>
+            <tr><td class="fn">Bullet</td><td class="sig">Bullet(text, styles?)</td><td>Single bullet point.</td></tr>
+            <tr><td class="fn">BulletList</td><td class="sig">BulletList(items, styles?)</td><td>List of bullet points.</td></tr>
+            <tr><td class="fn">Divider</td><td class="sig">Divider()</td><td>Horizontal rule.</td></tr>
+            <tr><td class="fn">Spacer</td><td class="sig">Spacer(points?)</td><td>Vertical spacing, default 100 twips.</td></tr>
+          </tbody>
+        </table>
         </div>
-<pre><span class="kw">import</span> {
-  <span class="fn">Resume</span>, <span class="fn">Header</span>, <span class="fn">Name</span>,
-  <span class="fn">Summary</span>, <span class="fn">exportFile</span>,
-} <span class="kw">from</span> <span class="str">"https://esm.sh/doclang"</span>;
 
-<span class="kw">import</span> { <span class="fn">Packer</span> } <span class="kw">from</span> <span class="str">"https://esm.sh/docx"</span>;
+        <p class="cat">header</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Header</td><td class="sig">Header(...children)</td><td>Container for name, title, and contact info.</td></tr>
+            <tr><td class="fn">Name</td><td class="sig">Name(name, styles?)</td><td>The candidate's name, large and centered.</td></tr>
+            <tr><td class="fn">Designation</td><td class="sig">Designation(title, styles?)</td><td>Professional title below the name.</td></tr>
+            <tr><td class="fn">Contact</td><td class="sig">Contact(info, styles?)</td><td>Email, phone, links — pipe separated on one line.</td></tr>
+            <tr><td class="fn">Address</td><td class="sig">Address(address, styles?)</td><td>Address line in small text.</td></tr>
+            <tr><td class="fn">Photo</td><td class="sig">Photo(config)</td><td>Inline photo image from buffer data.</td></tr>
+            <tr><td class="fn">PhotoPath</td><td class="sig">PhotoPath(path, config)</td><td>Photo from a local file path — Node only.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">profile</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Summary</td><td class="sig">Summary(text, styles?)</td><td>Professional summary paragraph.</td></tr>
+            <tr><td class="fn">Objective</td><td class="sig">Objective(text, styles?)</td><td>Career objective paragraph.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">experience</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Experience</td><td class="sig">Experience(...items)</td><td>Container that renders an "Experience" heading.</td></tr>
+            <tr><td class="fn">ExperienceItem</td><td class="sig">ExperienceItem(config, styles?)</td><td>Company + duration, designation, bullet points.</td></tr>
+            <tr><td class="fn">Company</td><td class="sig">Company(name, styles?)</td><td>Company name for custom layouts.</td></tr>
+            <tr><td class="fn">Duration</td><td class="sig">Duration(text, styles?)</td><td>Duration for custom layouts.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">education</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Education</td><td class="sig">Education(...items)</td><td>Container that renders an "Education" heading.</td></tr>
+            <tr><td class="fn">EducationItem</td><td class="sig">EducationItem(config, styles?)</td><td>Institution + year, degree below.</td></tr>
+            <tr><td class="fn">Institution</td><td class="sig">Institution(name, styles?)</td><td>Institution name for custom layouts.</td></tr>
+            <tr><td class="fn">Degree</td><td class="sig">Degree(name, styles?)</td><td>Degree for custom layouts.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">skills</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Skills</td><td class="sig">Skills(...skills)</td><td>Container that renders a "Skills" heading.</td></tr>
+            <tr><td class="fn">Skill</td><td class="sig">Skill(name, styles?)</td><td>Single skill as a bullet point.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">projects</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Projects</td><td class="sig">Projects(...items)</td><td>Container that renders a "Projects" heading.</td></tr>
+            <tr><td class="fn">Project</td><td class="sig">Project(config, styles?)</td><td>Name, optional description, points, and link.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">certifications</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Certifications</td><td class="sig">Certifications(...items)</td><td>Container that renders a "Certifications" heading.</td></tr>
+            <tr><td class="fn">Certification</td><td class="sig">Certification(config, styles?)</td><td>Name, optional issuer, and date.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">languages</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Languages</td><td class="sig">Languages(...items)</td><td>Container that renders a "Languages" heading.</td></tr>
+            <tr><td class="fn">Language</td><td class="sig">Language(config, styles?)</td><td>Name, optional proficiency.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">awards</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">Awards</td><td class="sig">Awards(...items)</td><td>Container that renders an "Awards" heading.</td></tr>
+            <tr><td class="fn">Award</td><td class="sig">Award(config, styles?)</td><td>Title, optional issuer, and date.</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <p class="cat">references</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">References</td><td class="sig">References(...items)</td><td>Container that renders a "References" heading.</td></tr>
+            <tr><td class="fn">Reference</td><td class="sig">Reference(config, styles?)</td><td>Name, "title at company", email | phone.</td></tr>
+          </tbody>
+        </table>
+        </div>
+      </section>
+
+      <!-- STYLES -->
+      <section id="styles">
+        <div class="sec-head"><span class="tag">STYLES</span><span class="rule"></span></div>
+        <p><code>defaultStyles</code> ships a built-in design. <code>createStyles(overrides?)</code> merges a partial override over it — pass any subset of tokens, leave the rest to the defaults. Sizes are in half-points (<code>24</code> = 12pt), colors are hex without the <code>#</code>, and spacing is in twips.</p>
+        <div class="file">styles.ts</div>
+<pre class="code"><span class="kw">import</span> { createStyles, Resume, Header, Name, Experience, ExperienceItem } <span class="kw">from</span> <span class="str">"doclang"</span>;
+
+<span class="kw">const</span> styles <span class="op">=</span> <span class="fn">createStyles</span>({
+  <span class="prop">name</span>: { <span class="prop">font</span>: <span class="str">"Georgia"</span>, <span class="prop">size</span>: <span class="num">36</span>, <span class="prop">bold</span>: <span class="kw">true</span>, <span class="prop">color</span>: <span class="str">"1A1A2E"</span> },
+  <span class="prop">sectionHeading</span>: { <span class="prop">color</span>: <span class="str">"E94560"</span>, <span class="prop">bold</span>: <span class="kw">true</span> },
+  <span class="prop">text</span>: { <span class="prop">font</span>: <span class="str">"Calibri"</span>, <span class="prop">size</span>: <span class="num">20</span> },
+});
 
 <span class="kw">const</span> resume <span class="op">=</span> <span class="fn">Resume</span>(
-  <span class="fn">Header</span>(<span class="fn">Name</span>(<span class="str">"Your Name"</span>)),
-  <span class="fn">Summary</span>(<span class="str">"Your summary here."</span>)
-);
+  <span class="fn">Header</span>(<span class="fn">Name</span>(<span class="str">"John Doe"</span>, styles)),
+  <span class="fn">Experience</span>(
+    <span class="fn">ExperienceItem</span>({
+      <span class="prop">company</span>: <span class="str">"Tech Corp"</span>,
+      <span class="prop">designation</span>: <span class="str">"Engineer"</span>,
+      <span class="prop">duration</span>: <span class="str">"2020 – Present"</span>,
+      <span class="prop">points</span>: [<span class="str">"Built things"</span>],
+    }, styles)
+  )
+);</pre>
+        <h3>Style tokens</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>token</th><th>used by</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">heading</td><td>Heading</td></tr>
+            <tr><td class="fn">subHeading</td><td>SubHeading</td></tr>
+            <tr><td class="fn">sectionHeading</td><td>SectionHeading and all section containers</td></tr>
+            <tr><td class="fn">name</td><td>Name</td></tr>
+            <tr><td class="fn">designation</td><td>Designation, ExperienceItem, EducationItem</td></tr>
+            <tr><td class="fn">text</td><td>Text, Summary, Objective</td></tr>
+            <tr><td class="fn">smallText</td><td>SmallText, Address</td></tr>
+            <tr><td class="fn">bullet</td><td>Bullet, BulletList</td></tr>
+            <tr><td class="fn">company</td><td>Company, Institution, Skill, Project, Certification, Language, Award</td></tr>
+            <tr><td class="fn">duration</td><td>Duration, and experience / education / certification / award dates</td></tr>
+            <tr><td class="fn">contact</td><td>Contact</td></tr>
+            <tr><td class="fn">skill</td><td>Skill</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>Each token is a <code>StyleToken</code> with optional <code>font</code>, <code>size</code>, <code>bold</code>, <code>italics</code>, <code>uppercase</code>, <code>color</code>, <code>spacing</code>, <code>alignment</code>, and <code>border</code> fields.</p>
+      </section>
 
-<span class="kw">const</span> buffer <span class="op">=</span> <span class="kw">await</span> <span class="fn">Packer</span>.<span class="fn">toBuffer</span>(resume);</pre>
-      </div>
-    </div>
-  </section>
+      <!-- API -->
+      <section id="api">
+        <div class="sec-head"><span class="tag">API</span><span class="rule"></span></div>
 
-  <!-- FOOTER -->
+        <h3>exportFile(document, options?)</h3>
+        <p>The recommended way to save a document. Handles DOCX generation, file writing, and optional PDF conversion — no need to import <code>Packer</code>, <code>fs</code>, or <code>child_process</code>.</p>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>option</th><th>type</th><th>default</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">outputDir</td><td class="sig">string</td><td class="sig">"./exports"</td><td>Directory to save files in, created automatically.</td></tr>
+            <tr><td class="fn">fileName</td><td class="sig">string</td><td class="sig">"resume"</td><td>Base file name without extension.</td></tr>
+            <tr><td class="fn">pdf</td><td class="sig">boolean</td><td class="sig">false</td><td>Convert DOCX to PDF with LibreOffice.</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <p>Returns <code>{ docx: string, pdf?: string }</code> with absolute paths. Throws meaningful errors if any step fails. PDF conversion requires LibreOffice (<code>soffice</code>) on PATH.</p>
+        <div class="file">export.ts</div>
+<pre class="code"><span class="kw">const</span> { docx } <span class="op">=</span> <span class="kw">await</span> <span class="fn">exportFile</span>(resume, {
+  <span class="prop">outputDir</span>: <span class="str">"./exports"</span>,
+  <span class="prop">fileName</span>: <span class="str">"john_doe"</span>,
+});
+
+<span class="kw">const</span> { docx, pdf } <span class="op">=</span> <span class="kw">await</span> <span class="fn">exportFile</span>(resume, {
+  <span class="prop">outputDir</span>: <span class="str">"./exports"</span>,
+  <span class="prop">fileName</span>: <span class="str">"john_doe"</span>,
+  <span class="prop">pdf</span>: <span class="kw">true</span>, <span class="cm">// requires soffice</span>
+});</pre>
+
+        <h3>Utilities</h3>
+        <div class="table-wrap">
+        <table>
+          <thead><tr><th>name</th><th>signature</th><th>purpose</th></tr></thead>
+          <tbody>
+            <tr><td class="fn">formatContact</td><td class="sig">formatContact(info): string</td><td>Formats a ContactInfo object into a pipe-separated string.</td></tr>
+            <tr><td class="fn">normalizeList</td><td class="sig">normalizeList(items): string[]</td><td>Filters out undefined, null, and empty entries.</td></tr>
+            <tr><td class="fn">sectionId</td><td class="sig">sectionId(label): string</td><td>Creates a section separator name, e.g. "section_experience".</td></tr>
+          </tbody>
+        </table>
+        </div>
+
+        <h3>Types</h3>
+        <p>Configuration objects — <code>ContactInfo</code>, <code>PhotoConfig</code>, <code>ExperienceItemConfig</code>, <code>EducationItemConfig</code>, <code>ProjectConfig</code>, <code>CertificationConfig</code>, <code>LanguageConfig</code>, <code>AwardConfig</code>, <code>ReferenceConfig</code> — mirror the component signatures above. The core types:</p>
+        <div class="file">types.ts</div>
+<pre class="code"><span class="kw">type</span> <span class="type">SectionComponent</span> <span class="op">=</span> () <span class="op">=&gt;</span> <span class="type">Paragraph</span>[];
+
+<span class="kw">interface</span> <span class="type">StyleToken</span> {
+  <span class="prop">font?</span>: <span class="type">string</span>;
+  <span class="prop">size?</span>: <span class="type">number</span>;     <span class="cm">// half-points, 24 = 12pt</span>
+  <span class="prop">bold?</span>: <span class="type">boolean</span>;
+  <span class="prop">italics?</span>: <span class="type">boolean</span>;
+  <span class="prop">uppercase?</span>: <span class="type">boolean</span>;
+  <span class="prop">color?</span>: <span class="type">string</span>;    <span class="cm">// hex, no "#"</span>
+  <span class="prop">spacing?</span>: { <span class="prop">before?</span>: <span class="type">number</span>; <span class="prop">after?</span>: <span class="type">number</span>; <span class="prop">line?</span>: <span class="type">number</span> };
+  <span class="prop">alignment?</span>: <span class="str">"left"</span> <span class="op">|</span> <span class="str">"center"</span> <span class="op">|</span> <span class="str">"right"</span>;
+}</pre>
+        <p class="dim">Full signatures for every config object live in <a href="https://github.com/mohamed-shahal/DocLang/blob/main/REFERENCE.md" target="_blank" rel="noopener">REFERENCE.md</a>.</p>
+      </section>
+
+    </main>
+  </div>
+
   <footer>
-    <span>DocLang is open source under the MIT License.</span>
-    <div style="display:flex;gap:20px;">
-      <a href="https://github.com/mohamed-shahal/DocLang" target="_blank" rel="noopener">GitHub</a>
-      <a href="https://www.npmjs.com/package/doclang" target="_blank" rel="noopener">npm</a>
-      <a href="https://github.com/mohamed-shahal/DocLang/blob/main/REFERENCE.md" target="_blank" rel="noopener">Reference</a>
+    <div class="foot-inner">
+      <span>doclang(1) — MIT License</span>
+      <span class="exit">exit 0</span>
+      <span class="dim"><a href="https://github.com/mohamed-shahal/DocLang" target="_blank" rel="noopener">github.com/mohamed-shahal/DocLang</a> &middot; <a href="https://www.npmjs.com/package/doclang" target="_blank" rel="noopener">npm</a></span>
     </div>
   </footer>
 
   <script>
-    function copyInstall() {
-      navigator.clipboard.writeText('npm install doclang').then(() => {
-        const btn = document.querySelector('.install-cmd');
-        const original = btn.innerHTML;
-        btn.innerHTML = '<span class="mono">Copied!</span>';
-        setTimeout(() => { btn.innerHTML = original; }, 1500);
+    (function () {
+      var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+      document.querySelectorAll('.copy').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var text = btn.getAttribute('data-copy') || '';
+          navigator.clipboard.writeText(text).then(function () {
+            btn.classList.add('copied');
+            btn.textContent = 'copied';
+            setTimeout(function () {
+              btn.classList.remove('copied');
+              btn.textContent = 'copy';
+            }, 1500);
+          });
+        });
       });
-    }
+
+      var typed = document.getElementById('typed');
+      var outEl = document.getElementById('out');
+      var preview = document.getElementById('preview');
+
+      function buildBox(lines, width) {
+        var w = width;
+        var repeat = function (ch, n) { return new Array(n + 1).join(ch); };
+        var pad = function (s) {
+          s = s || '';
+          if (s.length > w) s = s.slice(0, w);
+          return s + repeat(' ', w - s.length);
+        };
+        var out = ['┌' + repeat('─', w) + '┐'];
+        lines.forEach(function (line, i) {
+          out.push('│' + pad(line) + '│');
+          if (i === 3 || i === 8) out.push('├' + repeat('─', w) + '┤');
+        });
+        out.push('└' + repeat('─', w) + '┘');
+        return out.join('\n');
+      }
+
+      var content = [
+        '  JANE SMITH',
+        '  jane@example.com · github.com/janesmith',
+        '',
+        '  EXPERIENCE',
+        '  ▸ Tech Corp — Senior Engineer    2021–PRESENT',
+        '    · Led monolith → microservices migration',
+        '    · Reduced deploy time by 70%',
+        '',
+        '  EDUCATION',
+        '  ▸ Stanford · M.S. Computer Science  2018'
+      ];
+
+      var outLines = Array.prototype.slice.call(outEl.querySelectorAll('.line'));
+      var cmd = 'node build.mjs';
+
+      function finish() {
+        typed.textContent = cmd;
+        outLines.forEach(function (ln, k) {
+          setTimeout(function () {
+            ln.style.display = '';
+            if (k === outLines.length - 1) {
+              preview.hidden = false;
+              preview.textContent = buildBox(content, 52);
+            }
+          }, reduced ? 0 : 220 * (k + 1) + 150);
+        });
+      }
+
+      if (reduced) {
+        finish();
+      } else {
+        var i = 0;
+        (function step() {
+          typed.textContent = cmd.slice(0, i);
+          i += 1;
+          if (i <= cmd.length) setTimeout(step, 42);
+          else setTimeout(finish, 350);
+        })();
+      }
+
+      var treeLinks = Array.prototype.slice.call(document.querySelectorAll('.tree a'));
+      var map = {};
+      treeLinks.forEach(function (a) {
+        var href = a.getAttribute('href') || '';
+        if (href.charAt(0) === '#') map[href.slice(1)] = a;
+      });
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            var a = map[en.target.id];
+            if (!a || !en.isIntersecting) return;
+            treeLinks.forEach(function (l) { l.classList.remove('active'); });
+            a.classList.add('active');
+          });
+        }, { rootMargin: '-10% 0px -80% 0px' });
+        document.querySelectorAll('main section').forEach(function (s) { io.observe(s); });
+      }
+    })();
   </script>
 
 </body>
