@@ -334,6 +334,8 @@ Photo({
 
 A photo in the header loaded from a local file path.
 
+This helper reads the image from disk at runtime, so it is intended for Node.js usage and not the browser bundle.
+
 ```ts
 function PhotoPath(imagePath: string, config: Omit<PhotoConfig, "data">): SectionComponent
 ```
