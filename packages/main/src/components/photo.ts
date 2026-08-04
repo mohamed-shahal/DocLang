@@ -58,7 +58,7 @@ export function PhotoPath(
     return [
       new Paragraph({
         children: [image],
-        alignment: "left" as const,
+        alignment: "right" as const,
         spacing: { after: 100 },
       }),
     ];
