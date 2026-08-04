@@ -126,7 +126,7 @@ export function Photo(config: PhotoConfig): SectionComponent {
     return [
       new Paragraph({
         children: [image],
-        alignment: "right" as const,
+        alignment: "left" as const,
         spacing: { after: 100 },
       }),
     ];
