@@ -103,7 +103,7 @@ export function Address(
   address: string,
   styles?: ResumeStyles,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).smallText, address, { alignment: "center" })];
+  return () => [paragraphFromToken(getStyles(styles).smallText, address)];
 }
 
 /**
@@ -126,7 +126,7 @@ export function Photo(config: PhotoConfig): SectionComponent {
     return [
       new Paragraph({
         children: [image],
-        alignment: "center" as const,
+        alignment: "left" as const,
         spacing: { after: 100 },
       }),
     ];
