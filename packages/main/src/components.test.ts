@@ -133,7 +133,7 @@ describe("Header Components", () => {
     expect(result).toHaveLength(3);
   });
 
-  it("PhotoPath returns a left-aligned image paragraph from a file path", async () => {
+  it("PhotoPath returns a centered image paragraph from a file path", async () => {
     const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), "doclang-photo-"));
     const imagePath = path.join(tempDir, "photo.png");
     const png = Buffer.from(

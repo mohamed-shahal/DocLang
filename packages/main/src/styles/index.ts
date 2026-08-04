@@ -11,6 +11,7 @@ export const defaultStyles: ResumeStyles = {
     bold: true,
     color: "000000",
     spacing: { before: 0, after: 50, line: 276 },
+    alignment: "center",
   },
   designation: {
     font: "Arial",
@@ -18,12 +19,14 @@ export const defaultStyles: ResumeStyles = {
     bold: false,
     color: "000000",
     spacing: { before: 0, after: 65, line: 276 },
+    alignment: "center",
   },
   contact: {
     font: "Arial",
     size: 17,
     color: "000000",
     spacing: { before: 0, after: 0, line: 240 },
+    alignment: "center",
   },
   sectionHeading: {
     font: "Arial",
@@ -78,6 +81,7 @@ export const defaultStyles: ResumeStyles = {
     bold: true,
     color: "000000",
     spacing: { before: 0, after: 60, line: 276 },
+    alignment: "center",
   },
   subHeading: {
     font: "Arial",
