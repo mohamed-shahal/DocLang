@@ -184,6 +184,22 @@ describe("Header Components", () => {
     })();
     expect(result).toHaveLength(1);
   });
+
+  it("ResumeImage floats beside text when side is set", async () => {
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1mX2kAAAAASUVORK5CYII=",
+      "base64"
+    );
+
+    const doc = Resume(
+      ResumeImage({ data: png, width: 80, height: 80, side: "right" }),
+      Text("This text should wrap beside the image.")
+    );
+
+    const buffer = await Packer.toBuffer(doc);
+    expect(buffer).toBeInstanceOf(Buffer);
+    expect(buffer.length).toBeGreaterThan(0);
+  });
 });
 
 describe("Profile Components", () => {

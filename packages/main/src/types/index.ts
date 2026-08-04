@@ -61,6 +61,10 @@ export interface ImageConfig {
    * Paragraph alignment. Defaults to "right".
    */
   alignment?: "left" | "center" | "right";
+  /**
+   * Float the image on this side so following text wraps beside it.
+   */
+  side?: "left" | "right";
 }
 
 /**

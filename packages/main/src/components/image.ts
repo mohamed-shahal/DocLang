@@ -3,6 +3,7 @@ import {
   Paragraph,
   ImageRun,
 } from "../core/index.js";
+import { TextWrappingType } from "docx";
 
 export function detectImageType(
   data: Buffer,
@@ -35,16 +36,42 @@ export function detectImageType(
 /**
  * A generic image component, right-aligned by default.
  *
- * @param config - Image configuration with data, width, height, and optional alignment.
+ * @param config - Image configuration with data, width, height, optional alignment and side.
  * @returns A section component producing an image paragraph.
  *
  * @example
  * ```ts
  * ResumeImage({ data: imageBuffer, width: 100, height: 100 })
  * ```
+ *
+ * @example
+ * ```ts
+ * // Float on the right so text wraps beside it
+ * ResumeImage({ data: imageBuffer, width: 100, height: 100, side: "right" })
+ * ```
  */
 export function ResumeImage(config: ImageConfig): SectionComponent {
   return () => {
+    const floating = config.side
+      ? {
+          horizontalPosition: {
+            relative: "column" as const,
+            align: config.side,
+          },
+          verticalPosition: {
+            relative: "paragraph" as const,
+            align: "top" as const,
+          },
+          allowOverlap: false,
+          wrap: {
+            type: TextWrappingType.SQUARE,
+            side: config.side === "left"
+              ? ("right" as const)
+              : ("left" as const),
+          },
+        }
+      : undefined;
+
     const image = new ImageRun({
       data: config.data,
       transformation: {
@@ -54,6 +81,7 @@ export function ResumeImage(config: ImageConfig): SectionComponent {
       type: Buffer.isBuffer(config.data)
         ? detectImageType(config.data)
         : "png",
+      floating,
     });
 
     return [
