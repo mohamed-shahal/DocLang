@@ -862,6 +862,78 @@ const resume = Resume(
 );
 ```
 
+### Theme File (styles in a separate file)
+
+Since `createStyles` returns a plain object, you can define the full theme once in its own file and import it anywhere. This keeps the resume builder clean and makes themes reusable.
+
+**`theme.js`:**
+
+```js
+import { createStyles } from "doclang";
+
+export const theme = createStyles({
+  // Header
+  name:          { font: "Georgia", size: 40, bold: true, color: "1F4E79", alignment: "center" },
+  designation:   { font: "Georgia", size: 18, color: "444444", alignment: "center" },
+  contact:       { font: "Arial",   size: 16, color: "555555", alignment: "center" },
+  // Sections
+  heading:       { font: "Georgia", size: 22, bold: true, color: "1F4E79" },
+  subHeading:    { font: "Arial",   size: 18, bold: true, color: "333333" },
+  sectionHeading:{ font: "Arial", size: 20, bold: true, uppercase: true,
+                   color: "1F4E79",
+                   border: { bottom: { style: "single", size: 8, color: "1F4E79", space: 1 } } },
+  // Body
+  text:          { font: "Arial", size: 17, color: "333333" },
+  smallText:     { font: "Arial", size: 15, color: "666666" },
+  bullet:        { font: "Arial", size: 17, color: "333333" },
+  // Experience / Skills
+  company:       { font: "Arial", size: 17, italics: true, color: "1F4E79" },
+  duration:      { font: "Arial", size: 16, color: "888888" },
+  skill:         { font: "Arial", size: 17, color: "333333" },
+});
+```
+
+Any token you omit falls back to `defaultStyles`.
+
+**`build.js`:**
+
+```js
+import { Resume, Header, Name, Designation, Contact, SectionHeading,
+         Experience, ExperienceItem, Skills, Skill, exportFile } from "doclang";
+import { theme } from "./theme.js";
+
+const resume = Resume(
+  Header(
+    Name("Jane Smith", theme),
+    Designation("Software Engineer", theme),
+    Contact({ email: "jane@example.com" }, theme),
+  ),
+  SectionHeading("Experience", theme),
+  Experience(
+    ExperienceItem({
+      company: "Tech Corp",
+      designation: "Senior Engineer",
+      duration: "2021 - Present",
+      points: ["Led microservices migration"],
+    }, theme)
+  ),
+  SectionHeading("Skills", theme),
+  Skills(
+    Skill("TypeScript", theme),
+    Skill("Node.js", theme)
+  ),
+);
+
+await exportFile(resume);
+```
+
+**Notes:**
+
+- Styles are per-component — pass the theme as the last argument to every component that needs it. There is no global set-once.
+- Export several themes to switch look-and-feel: `export const dark = createStyles({...})`, `export const modern = createStyles({...})`.
+- `createStyles` merges shallowly — nested objects like `spacing` and `border` are replaced wholesale, so override them as complete objects.
+- With TypeScript, the returned object is already typed as `ResumeStyles`, so you get autocomplete for every token field.
+
 ### Style Tokens
 
 Every token is a `StyleToken` with these optional fields:
