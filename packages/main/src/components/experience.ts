@@ -55,6 +55,9 @@ export function ExperienceItem(
     const s = getStyles(styles);
     const paragraphs: Paragraph[] = [];
 
+    // Designation (job title) first, in bold
+    paragraphs.push(paragraphFromToken(s.designation, config.designation));
+
     // Company name and duration on one line
     paragraphs.push(
       inlineParagraph(
@@ -62,12 +65,9 @@ export function ExperienceItem(
           { token: s.company, text: config.company },
           { token: s.duration, text: config.duration },
         ],
-        { tabStop: true, spacing: { before: 120, after: 0, line: 276 } },
+        { tabStop: true, spacing: { before: 0, after: 20, line: 240 } },
       ),
     );
-
-    // Designation
-    paragraphs.push(paragraphFromToken(s.designation, config.designation));
 
     // Bullet points
     for (const point of config.points) {

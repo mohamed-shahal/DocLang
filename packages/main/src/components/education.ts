@@ -55,6 +55,9 @@ export function EducationItem(
     const s = getStyles(styles);
     const paragraphs: Paragraph[] = [];
 
+    // Degree first, in bold
+    paragraphs.push(paragraphFromToken(s.designation, config.degree));
+
     // Institution and year on one line
     paragraphs.push(
       inlineParagraph(
@@ -62,12 +65,9 @@ export function EducationItem(
           { token: s.company, text: config.institution },
           { token: s.duration, text: config.year },
         ],
-        { tabStop: true, spacing: { before: 80, after: 0, line: 276 } },
+        { tabStop: true, spacing: { before: 0, after: 20, line: 240 } },
       ),
     );
-
-    // Degree
-    paragraphs.push(paragraphFromToken(s.designation, config.degree));
 
     return paragraphs;
   };

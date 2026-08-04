@@ -102,14 +102,9 @@ export function inlineParagraph(
 
   const children: (TextRun | Tab)[] = [];
 
-  if (options?.tabStop) {
-    children.push(
-      new Tab(),
-    );
-  }
-
-  for (const run of runs) {
-    children.push(textRunFromToken(run.token, run.text));
+  for (const [index, run] of runs.entries()) {
+    const text = index > 0 && options?.tabStop ? `\t${run.text}` : run.text;
+    children.push(textRunFromToken(run.token, text));
   }
 
   return new Paragraph({

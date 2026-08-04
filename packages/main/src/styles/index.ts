@@ -10,14 +10,14 @@ export const defaultStyles: ResumeStyles = {
     size: 40,
     bold: true,
     color: "000000",
-    spacing: { before: 0, after: 60, line: 240 },
+    spacing: { before: 0, after: 40, line: 240 },
   },
   designation: {
     font: "Arial",
     size: 22,
-    bold: false,
+    bold: true,
     color: "333333",
-    spacing: { before: 0, after: 40, line: 240 },
+    spacing: { before: 0, after: 30, line: 240 },
   },
   contact: {
     font: "Arial",
@@ -31,7 +31,7 @@ export const defaultStyles: ResumeStyles = {
     bold: true,
     uppercase: true,
     color: "000000",
-    spacing: { before: 220, after: 60, line: 240 },
+    spacing: { before: 200, after: 50, line: 240 },
     border: {
       bottom: {
         style: "single",
@@ -45,7 +45,7 @@ export const defaultStyles: ResumeStyles = {
     font: "Arial",
     size: 20,
     color: "000000",
-    spacing: { before: 0, after: 60, line: 240 },
+    spacing: { before: 0, after: 50, line: 240 },
   },
   smallText: {
     font: "Arial",
@@ -61,10 +61,10 @@ export const defaultStyles: ResumeStyles = {
   },
   company: {
     font: "Arial",
-    size: 21,
-    bold: true,
+    size: 20,
+    bold: false,
     color: "000000",
-    spacing: { before: 0, after: 40, line: 240 },
+    spacing: { before: 0, after: 30, line: 240 },
   },
   duration: {
     font: "Arial",
@@ -77,14 +77,14 @@ export const defaultStyles: ResumeStyles = {
     size: 24,
     bold: true,
     color: "000000",
-    spacing: { before: 0, after: 80, line: 240 },
+    spacing: { before: 0, after: 60, line: 240 },
   },
   subHeading: {
     font: "Arial",
     size: 21,
     bold: true,
     color: "333333",
-    spacing: { before: 120, after: 40, line: 240 },
+    spacing: { before: 100, after: 30, line: 240 },
   },
   skill: {
     font: "Arial",
