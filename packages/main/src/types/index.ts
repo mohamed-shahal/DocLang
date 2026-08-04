@@ -51,6 +51,19 @@ export interface PhotoConfig {
 }
 
 /**
+ * Configuration for a generic image component.
+ */
+export interface ImageConfig {
+  data: string | Buffer;
+  width: number;
+  height: number;
+  /**
+   * Paragraph alignment. Defaults to "right".
+   */
+  alignment?: "left" | "center" | "right";
+}
+
+/**
  * Configuration for an experience item.
  */
 export interface ExperienceItemConfig {

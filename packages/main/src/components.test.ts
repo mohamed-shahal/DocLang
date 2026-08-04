@@ -11,6 +11,7 @@ import {
   Contact,
   Address,
   PhotoPath,
+  ResumeImage,
   Summary,
   Objective,
   Experience,
@@ -156,6 +157,32 @@ describe("Header Components", () => {
     const buffer = await Packer.toBuffer(doc);
     expect(buffer).toBeInstanceOf(Buffer);
     expect(buffer.length).toBeGreaterThan(0);
+  });
+
+  it("ResumeImage returns a right-aligned image paragraph by default", () => {
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1mX2kAAAAASUVORK5CYII=",
+      "base64"
+    );
+
+    const result = ResumeImage({ data: png, width: 80, height: 80 })();
+    expect(result).toHaveLength(1);
+    expect(result[0]).toHaveProperty("root");
+  });
+
+  it("ResumeImage respects a custom alignment", () => {
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1mX2kAAAAASUVORK5CYII=",
+      "base64"
+    );
+
+    const result = ResumeImage({
+      data: png,
+      width: 80,
+      height: 80,
+      alignment: "center",
+    })();
+    expect(result).toHaveLength(1);
   });
 });
 

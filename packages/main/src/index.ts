@@ -38,6 +38,7 @@ export {
   Photo,
 } from "./components/header.js";
 export { PhotoPath } from "./components/photo.js";
+export { ResumeImage } from "./components/image.js";
 
 // Profile
 export { Summary, Objective } from "./components/profile.js";
@@ -86,6 +87,7 @@ export type {
   SectionComponent,
   ContactInfo,
   PhotoConfig,
+  ImageConfig,
   ExperienceItemConfig,
   EducationItemConfig,
   ProjectConfig,
