@@ -57,9 +57,7 @@ export function Name(
   name: string,
   styles?: ResumeStyles,
 ): SectionComponent {
-  return () => [
-    paragraphFromToken(getStyles(styles).name, name, { alignment: "center" }),
-  ];
+  return () => [paragraphFromToken(getStyles(styles).name, name)];
 }
 
 /**
@@ -73,11 +71,7 @@ export function Designation(
   title: string,
   styles?: ResumeStyles,
 ): SectionComponent {
-  return () => [
-    paragraphFromToken(getStyles(styles).designation, title, {
-      alignment: "center",
-    }),
-  ];
+  return () => [paragraphFromToken(getStyles(styles).designation, title)];
 }
 
 /**
@@ -94,7 +88,7 @@ export function Contact(
   return () => {
     const s = getStyles(styles);
     const text = formatContact(info);
-    return [paragraphFromToken(s.contact, text, { alignment: "center" })];
+    return [paragraphFromToken(s.contact, text)];
   };
 }
 
@@ -109,11 +103,7 @@ export function Address(
   address: string,
   styles?: ResumeStyles,
 ): SectionComponent {
-  return () => [
-    paragraphFromToken(getStyles(styles).smallText, address, {
-      alignment: "center",
-    }),
-  ];
+  return () => [paragraphFromToken(getStyles(styles).smallText, address)];
 }
 
 /**
