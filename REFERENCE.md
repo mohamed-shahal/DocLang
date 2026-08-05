@@ -103,90 +103,117 @@ Page margins are set to 0.8in top/bottom and 1in left/right by default.
 
 ---
 
+### `spacingAfter` (available on every component)
+
+Every component accepts an optional trailing `spacingAfter` argument — a number of twips (`1/20` pt, so `240` twips = one blank line at single spacing) — that sets the space rendered below the component's last paragraph.
+
+When omitted, the component's default spacing is used, so existing code is unaffected.
+
+```ts
+function Summary(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
+```
+
+**Example:**
+
+```ts
+Summary("Experienced developer.", undefined, 300)   // 300 twips of space below
+```
+
+**Conventions:**
+
+- Leaf components take it as a trailing third argument: `Summary(text, styles?, spacingAfter?)`.
+- Variadic containers (`Header`, `Experience`, `Education`, `Skills`, `Projects`, `Certifications`, `Languages`, `Awards`, `References`) take it as the trailing argument: `Experience(item, 300)`.
+- `Photo` and `ResumeImage` take it as the trailing second argument: `Photo(config, spacingAfter?)`.
+- `Spacer` takes it as `Spacer(points?, spacingAfter?)`; `Divider` as `Divider(spacingAfter?)`.
+- It applies to the **last** paragraph of the component's output.
+
+---
+
 ## Generic Components
 
 Basic building blocks usable anywhere in the resume.
 
-### `Heading(text, styles?)`
+### `Heading(text, styles?, spacingAfter?)`
 
 A large heading paragraph.
 
 ```ts
-function Heading(text: string, styles?: ResumeStyles): SectionComponent
+function Heading(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Heading("My Resume")`
 
 ---
 
-### `SubHeading(text, styles?)`
+### `SubHeading(text, styles?, spacingAfter?)`
 
 A sub-heading paragraph for subsection titles.
 
 ```ts
-function SubHeading(text: string, styles?: ResumeStyles): SectionComponent
+function SubHeading(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `SubHeading("Technical Details")`
 
 ---
 
-### `SectionHeading(text, styles?)`
+### `SectionHeading(text, styles?, spacingAfter?)`
 
 A section heading with a distinctive accent color. Used automatically by container components like `Experience`, `Education`, etc.
 
 ```ts
-function SectionHeading(text: string, styles?: ResumeStyles): SectionComponent
+function SectionHeading(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `SectionHeading("EXPERIENCE")`
 
 ---
 
-### `Text(text, styles?)`
+### `Text(text, styles?, spacingAfter?)`
 
 A normal text paragraph.
 
 ```ts
-function Text(text: string, styles?: ResumeStyles): SectionComponent
+function Text(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Text("This is a paragraph of text.")`
 
 ---
 
-### `SmallText(text, styles?)`
+### `SmallText(text, styles?, spacingAfter?)`
 
 A small text paragraph for secondary information.
 
 ```ts
-function SmallText(text: string, styles?: ResumeStyles): SectionComponent
+function SmallText(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `SmallText("Published on Jan 1, 2024")`
 
 ---
 
-### `Bullet(text, styles?)`
+### `Bullet(text, styles?, spacingAfter?)`
 
 A single bullet point paragraph.
 
 ```ts
-function Bullet(text: string, styles?: ResumeStyles): SectionComponent
+function Bullet(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Bullet("Built a REST API with 99.9% uptime")`
 
 ---
 
-### `BulletList(items, styles?)`
+### `BulletList(items, styles?, spacingAfter?)`
 
 A list of multiple bullet points.
 
 ```ts
 function BulletList(
   items: Array<string | SectionComponent>,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -202,24 +229,24 @@ BulletList([
 
 ---
 
-### `Divider()`
+### `Divider(spacingAfter?)`
 
 A horizontal divider line.
 
 ```ts
-function Divider(): SectionComponent
+function Divider(spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Divider()`
 
 ---
 
-### `Spacer(points?)`
+### `Spacer(points?, spacingAfter?)`
 
 Vertical spacing between sections. Default is 100 twips.
 
 ```ts
-function Spacer(points?: number): SectionComponent
+function Spacer(points?: number, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Spacer(200)`
@@ -230,12 +257,12 @@ function Spacer(points?: number): SectionComponent
 
 Components for the resume header (name, title, contact info).
 
-### `Header(...children)`
+### `Header(...children, spacingAfter?)`
 
-Container for all header content. Wraps Name, Designation, Contact, Address, Photo, and PhotoPath components.
+Container for all header content. Wraps Name, Designation, Contact, Address, Photo, and PhotoPath components. A trailing number sets the space below the header block.
 
 ```ts
-function Header(...children: Array<SectionComponent | string>): SectionComponent
+function Header(...children: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -250,36 +277,36 @@ Header(
 
 ---
 
-### `Name(name, styles?)`
+### `Name(name, styles?, spacingAfter?)`
 
 The candidate's name, displayed prominently (large, centered).
 
 ```ts
-function Name(name: string, styles?: ResumeStyles): SectionComponent
+function Name(name: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Name("John Doe")`
 
 ---
 
-### `Designation(title, styles?)`
+### `Designation(title, styles?, spacingAfter?)`
 
 The candidate's professional title, displayed below the name.
 
 ```ts
-function Designation(title: string, styles?: ResumeStyles): SectionComponent
+function Designation(title: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Designation("Senior Software Engineer")`
 
 ---
 
-### `Contact(info, styles?)`
+### `Contact(info, styles?, spacingAfter?)`
 
 Contact information displayed as a single line with pipe (`|`) separators.
 
 ```ts
-function Contact(info: ContactInfo, styles?: ResumeStyles): SectionComponent
+function Contact(info: ContactInfo, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:**
@@ -297,24 +324,24 @@ Contact({
 
 ---
 
-### `Address(address, styles?)`
+### `Address(address, styles?, spacingAfter?)`
 
 Address line displayed in small text.
 
 ```ts
-function Address(address: string, styles?: ResumeStyles): SectionComponent
+function Address(address: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Address("123 Main St, New York, NY 10001")`
 
 ---
 
-### `Photo(config)`
+### `Photo(config, spacingAfter?)`
 
 A photo in the header rendered as an inline image.
 
 ```ts
-function Photo(config: PhotoConfig): SectionComponent
+function Photo(config: PhotoConfig, spacingAfter?: number): SectionComponent
 ```
 
 **Example:**
@@ -352,14 +379,42 @@ PhotoPath("photo.jpg", {
 
 ---
 
+### `ResumeImage(config, spacingAfter?)`
+
+A generic image paragraph, right-aligned by default. Set `side` to `"left"` or `"right"` to float the image so following text wraps beside it.
+
+```ts
+function ResumeImage(config: ImageConfig, spacingAfter?: number): SectionComponent
+```
+
+**Config shape:**
+
+```ts
+interface ImageConfig {
+  data: string | Buffer;
+  width: number;
+  height: number;
+  alignment?: "left" | "center" | "right";
+  side?: "left" | "right";
+}
+```
+
+**Example:**
+
+```ts
+ResumeImage({ data: imageBuffer, width: 100, height: 100 })
+```
+
+---
+
 ## Profile Components
 
-### `Summary(text, styles?)`
+### `Summary(text, styles?, spacingAfter?)`
 
 A professional summary paragraph.
 
 ```ts
-function Summary(text: string, styles?: ResumeStyles): SectionComponent
+function Summary(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:**
@@ -372,12 +427,12 @@ Summary(
 
 ---
 
-### `Objective(text, styles?)`
+### `Objective(text, styles?, spacingAfter?)`
 
 A career objective paragraph.
 
 ```ts
-function Objective(text: string, styles?: ResumeStyles): SectionComponent
+function Objective(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:**
@@ -392,12 +447,12 @@ Objective(
 
 ## Experience Components
 
-### `Experience(...items)`
+### `Experience(...items, spacingAfter?)`
 
 Container for experience entries. Renders a section heading labeled "Experience".
 
 ```ts
-function Experience(...items: Array<SectionComponent | string>): SectionComponent
+function Experience(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -421,14 +476,15 @@ Experience(
 
 ---
 
-### `ExperienceItem(config, styles?)`
+### `ExperienceItem(config, styles?, spacingAfter?)`
 
 A single experience entry. Renders company and duration on one line (duration right-aligned via tab stop), designation below, and bullet points.
 
 ```ts
 function ExperienceItem(
   config: ExperienceItemConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -445,34 +501,34 @@ interface ExperienceItemConfig {
 
 ---
 
-### `Company(name, styles?)`
+### `Company(name, styles?, spacingAfter?)`
 
 Company name as a standalone component for custom layouts.
 
 ```ts
-function Company(name: string, styles?: ResumeStyles): SectionComponent
+function Company(name: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 ---
 
-### `Duration(text, styles?)`
+### `Duration(text, styles?, spacingAfter?)`
 
 Duration as a standalone component for custom layouts.
 
 ```ts
-function Duration(text: string, styles?: ResumeStyles): SectionComponent
+function Duration(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 ---
 
 ## Education Components
 
-### `Education(...items)`
+### `Education(...items, spacingAfter?)`
 
 Container for education entries. Renders a section heading labeled "Education".
 
 ```ts
-function Education(...items: Array<SectionComponent | string>): SectionComponent
+function Education(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -494,14 +550,15 @@ Education(
 
 ---
 
-### `EducationItem(config, styles?)`
+### `EducationItem(config, styles?, spacingAfter?)`
 
 A single education entry. Renders institution and year on one line (year right-aligned via tab stop), degree below.
 
 ```ts
 function EducationItem(
   config: EducationItemConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -517,34 +574,34 @@ interface EducationItemConfig {
 
 ---
 
-### `Institution(name, styles?)`
+### `Institution(name, styles?, spacingAfter?)`
 
 Institution name as a standalone component.
 
 ```ts
-function Institution(name: string, styles?: ResumeStyles): SectionComponent
+function Institution(name: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 ---
 
-### `Degree(name, styles?)`
+### `Degree(name, styles?, spacingAfter?)`
 
 Degree as a standalone component.
 
 ```ts
-function Degree(name: string, styles?: ResumeStyles): SectionComponent
+function Degree(name: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 ---
 
 ## Skills Components
 
-### `Skills(...skills)`
+### `Skills(...skills, spacingAfter?)`
 
 Container for skill items. Renders a section heading labeled "Skills".
 
 ```ts
-function Skills(...skills: Array<SectionComponent | string>): SectionComponent
+function Skills(...skills: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -561,12 +618,12 @@ Skills(
 
 ---
 
-### `Skill(name, styles?)`
+### `Skill(name, styles?, spacingAfter?)`
 
 A single skill displayed as a bullet point.
 
 ```ts
-function Skill(name: string, styles?: ResumeStyles): SectionComponent
+function Skill(name: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `Skill("GraphQL")`
@@ -575,12 +632,12 @@ function Skill(name: string, styles?: ResumeStyles): SectionComponent
 
 ## Projects Components
 
-### `Projects(...items)`
+### `Projects(...items, spacingAfter?)`
 
 Container for project entries. Renders a section heading labeled "Projects".
 
 ```ts
-function Projects(...items: Array<SectionComponent | string>): SectionComponent
+function Projects(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -598,14 +655,15 @@ Projects(
 
 ---
 
-### `Project(config, styles?)`
+### `Project(config, styles?, spacingAfter?)`
 
 A single project entry with name, optional description, optional bullet points, and optional link.
 
 ```ts
 function Project(
   config: ProjectConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -624,12 +682,12 @@ interface ProjectConfig {
 
 ## Certifications Components
 
-### `Certifications(...items)`
+### `Certifications(...items, spacingAfter?)`
 
 Container for certification entries. Renders a section heading labeled "Certifications".
 
 ```ts
-function Certifications(...items: Array<SectionComponent | string>): SectionComponent
+function Certifications(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -651,14 +709,15 @@ Certifications(
 
 ---
 
-### `Certification(config, styles?)`
+### `Certification(config, styles?, spacingAfter?)`
 
 A single certification entry. If issuer/date exist, renders the name on the left with "issuer, date" right-aligned via tab stop; otherwise renders just the name.
 
 ```ts
 function Certification(
   config: CertificationConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -676,12 +735,12 @@ interface CertificationConfig {
 
 ## Languages Components
 
-### `Languages(...items)`
+### `Languages(...items, spacingAfter?)`
 
 Container for language entries. Renders a section heading labeled "Languages".
 
 ```ts
-function Languages(...items: Array<SectionComponent | string>): SectionComponent
+function Languages(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -696,14 +755,15 @@ Languages(
 
 ---
 
-### `Language(config, styles?)`
+### `Language(config, styles?, spacingAfter?)`
 
 A single language entry. If proficiency exists, renders `"Name — Proficiency"` as a single styled paragraph; otherwise renders just the name.
 
 ```ts
 function Language(
   config: LanguageConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -720,12 +780,12 @@ interface LanguageConfig {
 
 ## Awards Components
 
-### `Awards(...items)`
+### `Awards(...items, spacingAfter?)`
 
 Container for award entries. Renders a section heading labeled "Awards".
 
 ```ts
-function Awards(...items: Array<SectionComponent | string>): SectionComponent
+function Awards(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -746,14 +806,15 @@ Awards(
 
 ---
 
-### `Award(config, styles?)`
+### `Award(config, styles?, spacingAfter?)`
 
 A single award entry. If issuer/date exist, renders the title on the left with "issuer, date" right-aligned via tab stop; otherwise renders just the title.
 
 ```ts
 function Award(
   config: AwardConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -771,12 +832,12 @@ interface AwardConfig {
 
 ## References Components
 
-### `References(...items)`
+### `References(...items, spacingAfter?)`
 
 Container for reference entries. Renders a section heading labeled "References".
 
 ```ts
-function References(...items: Array<SectionComponent | string>): SectionComponent
+function References(...items: Array<SectionComponent | string | number>): SectionComponent
 ```
 
 **Example:**
@@ -795,14 +856,15 @@ References(
 
 ---
 
-### `Reference(config, styles?)`
+### `Reference(config, styles?, spacingAfter?)`
 
 A single reference entry. Renders name, optional "title at company", and optional "email | phone".
 
 ```ts
 function Reference(
   config: ReferenceConfig,
-  styles?: ResumeStyles
+  styles?: ResumeStyles,
+  spacingAfter?: number
 ): SectionComponent
 ```
 
@@ -1029,6 +1091,18 @@ interface PhotoConfig {
   width: number;
   height: number;
   circular?: boolean;
+}
+```
+
+### `ImageConfig`
+
+```ts
+interface ImageConfig {
+  data: string | Buffer;
+  width: number;
+  height: number;
+  alignment?: "left" | "center" | "right";
+  side?: "left" | "right";
 }
 ```
 
