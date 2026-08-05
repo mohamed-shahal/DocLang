@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   ReferenceConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Paragraph, TextRun } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, withSpacingAfter, splitSpacingAfter, Paragraph, TextRun } from "../core/index.js";
 
 /**
  * A references section containing multiple reference entries.
@@ -19,12 +19,13 @@ import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Parag
  * ```
  */
 export function References(
-  ...items: Array<SectionComponent | string>
+  ...items: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items: children, spacingAfter } = splitSpacingAfter(items);
     const paragraphs: Paragraph[] = [];
 
-    for (const item of items) {
+    for (const item of children) {
       if (typeof item === "string") {
         paragraphs.push(...Text(item)());
       } else {
@@ -32,7 +33,7 @@ export function References(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -46,6 +47,7 @@ export function References(
 export function Reference(
   config: ReferenceConfig,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
@@ -66,7 +68,7 @@ export function Reference(
       paragraphs.push(paragraphFromToken(s.smallText, contact));
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 

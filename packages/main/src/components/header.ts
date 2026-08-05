@@ -4,6 +4,8 @@ import {
   textRunFromToken,
   inlineParagraph,
   getStyles,
+  withSpacingAfter,
+  splitSpacingAfter,
   Paragraph,
   TextRun,
   ImageRun,
@@ -29,12 +31,13 @@ import { Text } from "./generic.js";
  * ```
  */
 export function Header(
-  ...children: Array<SectionComponent | string>
+  ...children: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items, spacingAfter } = splitSpacingAfter(children);
     const paragraphs: Paragraph[] = [];
 
-    for (const child of children) {
+    for (const child of items) {
       if (typeof child === "string") {
         paragraphs.push(...Text(child)());
       } else {
@@ -42,7 +45,7 @@ export function Header(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -56,8 +59,13 @@ export function Header(
 export function Name(
   name: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).name, name)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).name, name)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -70,8 +78,13 @@ export function Name(
 export function Designation(
   title: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).designation, title)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).designation, title)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -84,11 +97,12 @@ export function Designation(
 export function Contact(
   info: ContactInfo,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
     const text = formatContact(info);
-    return [paragraphFromToken(s.contact, text)];
+    return withSpacingAfter([paragraphFromToken(s.contact, text)], spacingAfter);
   };
 }
 
@@ -102,8 +116,13 @@ export function Contact(
 export function Address(
   address: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).smallText, address)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).smallText, address)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -112,7 +131,10 @@ export function Address(
  * @param config - Photo configuration with data, width, and height.
  * @returns A section component producing an image paragraph.
  */
-export function Photo(config: PhotoConfig): SectionComponent {
+export function Photo(
+  config: PhotoConfig,
+  spacingAfter?: number,
+): SectionComponent {
   return () => {
     const image = new ImageRun({
       data: config.data,
@@ -127,7 +149,7 @@ export function Photo(config: PhotoConfig): SectionComponent {
       new Paragraph({
         children: [image],
         alignment: "left" as const,
-        spacing: { after: 100 },
+        spacing: { after: spacingAfter ?? 100 },
       }),
     ];
   };

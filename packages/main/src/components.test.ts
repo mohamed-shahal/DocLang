@@ -2,7 +2,8 @@ import * as fs from "fs/promises";
 import * as os from "os";
 import * as path from "path";
 import { describe, it, expect } from "vitest";
-import { Packer } from "docx";
+import { Packer, Document } from "docx";
+import { inflateRawSync } from "zlib";
 import {
   Resume,
   Header,
@@ -590,5 +591,109 @@ describe("Resume Integration", () => {
     const buffer = await Packer.toBuffer(doc);
     expect(buffer).toBeInstanceOf(Buffer);
     expect(buffer.length).toBeGreaterThan(0);
+  });
+});
+
+describe("spacingAfter", () => {
+  async function documentXml(
+    doc: InstanceType<typeof Document>
+  ): Promise<string> {
+    const buf = await Packer.toBuffer(doc);
+    const eocd = buf.lastIndexOf(Buffer.from("PK\x05\x06"));
+    const cdCount = buf.readUInt16LE(eocd + 10);
+    const cdOffset = buf.readUInt32LE(eocd + 16);
+    let off = cdOffset;
+
+    for (let i = 0; i < cdCount; i++) {
+      const nameLen = buf.readUInt16LE(off + 28);
+      const extraLen = buf.readUInt16LE(off + 30);
+      const commentLen = buf.readUInt16LE(off + 32);
+      const compSize = buf.readUInt32LE(off + 20);
+      const method = buf.readUInt16LE(off + 10);
+      const localOff = buf.readUInt32LE(off + 42);
+      const name = buf.slice(off + 46, off + 46 + nameLen).toString();
+
+      if (name === "word/document.xml") {
+        const lnameLen = buf.readUInt16LE(localOff + 26);
+        const lextraLen = buf.readUInt16LE(localOff + 28);
+        const data = buf.slice(
+          localOff + 30 + lnameLen + lextraLen,
+          localOff + 30 + lnameLen + lextraLen + compSize
+        );
+        return method === 8
+          ? inflateRawSync(data).toString()
+          : data.toString();
+      }
+
+      off += 46 + nameLen + extraLen + commentLen;
+    }
+
+    throw new Error("word/document.xml not found");
+  }
+
+  function pAfter(xml: string, text: string): string | undefined {
+    const i = xml.indexOf(text);
+    if (i === -1) return undefined;
+    const pStart = xml.lastIndexOf("<w:p>", i);
+    const pEnd = xml.indexOf("</w:p>", i);
+    const block = xml.slice(pStart, pEnd);
+    const m = block.match(/<w:spacing[^>]*w:after="(\d+)"/);
+    return m ? m[1] : undefined;
+  }
+
+  it("Summary applies spacingAfter to its paragraph", async () => {
+    const xml = await documentXml(Resume(Summary("Hello", undefined, 777)));
+    expect(pAfter(xml, "Hello")).toBe("777");
+  });
+
+  it("leaf components apply spacingAfter without styles", async () => {
+    const xml = await documentXml(Resume(Name("Jane Doe", undefined, 888)));
+    expect(pAfter(xml, "Jane Doe")).toBe("888");
+  });
+
+  it("multi-paragraph components apply spacingAfter to the last paragraph", async () => {
+    const xml = await documentXml(
+      Resume(
+        ExperienceItem(
+          {
+            company: "ABC",
+            designation: "Dev",
+            duration: "2020-2021",
+            points: ["First point", "Last point"],
+          },
+          undefined,
+          999
+        )
+      )
+    );
+    expect(pAfter(xml, "Last point")).toBe("999");
+    expect(pAfter(xml, "First point")).not.toBe("999");
+  });
+
+  it("variadic containers accept a trailing spacingAfter number", async () => {
+    const xml = await documentXml(
+      Resume(
+        Experience(
+          ExperienceItem({
+            company: "A",
+            designation: "Dev",
+            duration: "2020",
+            points: ["Point"],
+          }),
+          444
+        )
+      )
+    );
+    expect(pAfter(xml, "Point")).toBe("444");
+  });
+
+  it("Skill applies spacingAfter to its paragraph", async () => {
+    const xml = await documentXml(Resume(Skill("TypeScript", undefined, 555)));
+    expect(pAfter(xml, "TypeScript")).toBe("555");
+  });
+
+  it("default output keeps the token spacing when spacingAfter is omitted", async () => {
+    const xml = await documentXml(Resume(Summary("Plain")));
+    expect(pAfter(xml, "Plain")).toBe("50");
   });
 });

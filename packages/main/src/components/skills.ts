@@ -1,5 +1,5 @@
 import type { SectionComponent, ResumeStyles } from "../types/index.js";
-import { paragraphFromToken, textRunFromToken, getStyles, Paragraph, TextRun } from "../core/index.js";
+import { paragraphFromToken, textRunFromToken, getStyles, withSpacingAfter, splitSpacingAfter, trackParagraph, Paragraph, TextRun } from "../core/index.js";
 
 /**
  * A skills section displaying skill tags inline.
@@ -17,12 +17,13 @@ import { paragraphFromToken, textRunFromToken, getStyles, Paragraph, TextRun } f
  * ```
  */
 export function Skills(
-  ...skills: Array<SectionComponent | string>
+  ...skills: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items, spacingAfter } = splitSpacingAfter(skills);
     const paragraphs: Paragraph[] = [];
 
-    for (const skill of skills) {
+    for (const skill of items) {
       if (typeof skill === "string") {
         paragraphs.push(...Text(skill)());
       } else {
@@ -30,7 +31,7 @@ export function Skills(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -39,20 +40,24 @@ export function Skills(
  *
  * @param name - The skill name.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the paragraph.
  * @returns A section component producing a skill paragraph.
  */
 export function Skill(
   name: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
-    return [
-      new Paragraph({
-        children: [textRunFromToken(s.skill, name)],
-        spacing: s.skill.spacing,
-      }),
-    ];
+    const options = {
+      children: [textRunFromToken(s.skill, name)],
+      spacing: s.skill.spacing,
+    };
+    return withSpacingAfter(
+      [trackParagraph(new Paragraph(options), options)],
+      spacingAfter,
+    );
   };
 }
 

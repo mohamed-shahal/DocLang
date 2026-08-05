@@ -50,7 +50,10 @@ export function detectImageType(
  * ResumeImage({ data: imageBuffer, width: 100, height: 100, side: "right" })
  * ```
  */
-export function ResumeImage(config: ImageConfig): SectionComponent {
+export function ResumeImage(
+  config: ImageConfig,
+  spacingAfter?: number,
+): SectionComponent {
   return () => {
     const floating = config.side
       ? {
@@ -91,7 +94,7 @@ export function ResumeImage(config: ImageConfig): SectionComponent {
           | "left"
           | "center"
           | "right",
-        spacing: { after: 100 },
+        spacing: { after: spacingAfter ?? 100 },
       }),
     ];
   };

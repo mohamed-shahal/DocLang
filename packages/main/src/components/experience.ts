@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   ExperienceItemConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, getStyles, Paragraph, BULLET_NUMBERING } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, getStyles, withSpacingAfter, splitSpacingAfter, Paragraph, BULLET_NUMBERING } from "../core/index.js";
 
 /**
  * A section heading labeled "Experience".
@@ -13,12 +13,13 @@ import { paragraphFromToken, inlineParagraph, getStyles, Paragraph, BULLET_NUMBE
  * @returns A section component producing a section heading.
  */
 export function Experience(
-  ...items: Array<SectionComponent | string>
+  ...items: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items: children, spacingAfter } = splitSpacingAfter(items);
     const paragraphs: Paragraph[] = [];
 
-    for (const item of items) {
+    for (const item of children) {
       if (typeof item === "string") {
         paragraphs.push(...Text(item)());
       } else {
@@ -26,7 +27,7 @@ export function Experience(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -50,6 +51,7 @@ export function Experience(
 export function ExperienceItem(
   config: ExperienceItemConfig,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
@@ -78,7 +80,7 @@ export function ExperienceItem(
       );
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -87,13 +89,19 @@ export function ExperienceItem(
  *
  * @param name - Company name.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the paragraph.
  * @returns A section component producing a company paragraph.
  */
 export function Company(
   name: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).company, name)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).company, name)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -101,13 +109,19 @@ export function Company(
  *
  * @param text - Duration text (e.g., "2020 - Present").
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the paragraph.
  * @returns A section component producing a duration paragraph.
  */
 export function Duration(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).duration, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).duration, text)],
+      spacingAfter,
+    );
 }
 
 // Re-use Text from generic for string fallback in Experience

@@ -1,4 +1,4 @@
-import type { ResumeStyles, StyleToken } from "../types/index.js";
+import type { ResumeStyles, StyleToken, SectionComponent } from "../types/index.js";
 import { defaultStyles } from "../styles/index.js";
 import {
   Paragraph,
@@ -19,6 +19,7 @@ import {
   LevelFormat,
   Packer,
 } from "docx";
+import type { IParagraphOptions } from "docx";
 
 const BORDER_STYLE_MAP: Record<string, (typeof BorderStyle)[keyof typeof BorderStyle]> = {
   single: BorderStyle.SINGLE,
@@ -26,6 +27,61 @@ const BORDER_STYLE_MAP: Record<string, (typeof BorderStyle)[keyof typeof BorderS
   thick: BorderStyle.THICK,
   none: BorderStyle.NONE,
 };
+
+/**
+ * Tracks the construction options of every paragraph so that spacing can be
+ * re-applied later (e.g. the shared `spacingAfter` component parameter).
+ */
+const paragraphOptions = new WeakMap<Paragraph, IParagraphOptions>();
+
+function trackParagraph(
+  paragraph: Paragraph,
+  options: IParagraphOptions,
+): Paragraph {
+  paragraphOptions.set(paragraph, options);
+  return paragraph;
+}
+
+/**
+ * Apply an extra `spacing.after` value to the last paragraph of a list.
+ * When `spacingAfter` is undefined the list is returned unchanged.
+ */
+export function withSpacingAfter(
+  paragraphs: Paragraph[],
+  spacingAfter?: number,
+): Paragraph[] {
+  if (spacingAfter === undefined || paragraphs.length === 0) {
+    return paragraphs;
+  }
+
+  const last = paragraphs[paragraphs.length - 1];
+  const options = paragraphOptions.get(last);
+
+  if (options) {
+    paragraphs[paragraphs.length - 1] = new Paragraph({
+      ...options,
+      spacing: { ...(options.spacing ?? {}), after: spacingAfter },
+    });
+  }
+
+  return paragraphs;
+}
+
+/**
+ * Extract an optional trailing `spacingAfter` number from variadic component
+ * arguments (components use rest parameters, so the value is passed last).
+ */
+export function splitSpacingAfter(
+  args: Array<SectionComponent | string | number>,
+): { items: Array<SectionComponent | string>; spacingAfter?: number } {
+  if (args.length > 0 && typeof args[args.length - 1] === "number") {
+    return {
+      items: args.slice(0, -1) as Array<SectionComponent | string>,
+      spacingAfter: args[args.length - 1] as number,
+    };
+  }
+  return { items: args as Array<SectionComponent | string> };
+}
 
 /**
  * Create a TextRun from a StyleToken.
@@ -74,13 +130,24 @@ export function paragraphFromToken(
     };
   }
 
-  return new Paragraph({
-    children: [textRunFromToken(token, text)],
-    spacing: token.spacing,
-    alignment: alignmentMap[options?.alignment ?? token.alignment ?? "left"],
-    numbering: options?.numbering,
-    border: Object.keys(borderConfig).length > 0 ? borderConfig : undefined,
-  });
+  const children = [textRunFromToken(token, text)];
+
+  return trackParagraph(
+    new Paragraph({
+      children,
+      spacing: token.spacing,
+      alignment: alignmentMap[options?.alignment ?? token.alignment ?? "left"],
+      numbering: options?.numbering,
+      border: Object.keys(borderConfig).length > 0 ? borderConfig : undefined,
+    }),
+    {
+      children,
+      spacing: token.spacing,
+      alignment: alignmentMap[options?.alignment ?? token.alignment ?? "left"],
+      numbering: options?.numbering,
+      border: Object.keys(borderConfig).length > 0 ? borderConfig : undefined,
+    },
+  );
 }
 
 /**
@@ -107,48 +174,78 @@ export function inlineParagraph(
     children.push(textRunFromToken(run.token, text));
   }
 
-  return new Paragraph({
-    children,
-    spacing: options?.spacing,
-    alignment: options?.alignment
-      ? alignmentMap[options.alignment]
-      : undefined,
-    tabStops: options?.tabStop
-      ? [
-          {
-            type: TabStopType.RIGHT,
-            position: TabStopPosition.MAX,
-          },
-        ]
-      : undefined,
-  });
+  return trackParagraph(
+    new Paragraph({
+      children,
+      spacing: options?.spacing,
+      alignment: options?.alignment
+        ? alignmentMap[options.alignment]
+        : undefined,
+      tabStops: options?.tabStop
+        ? [
+            {
+              type: TabStopType.RIGHT,
+              position: TabStopPosition.MAX,
+            },
+          ]
+        : undefined,
+    }),
+    {
+      children,
+      spacing: options?.spacing,
+      alignment: options?.alignment
+        ? alignmentMap[options.alignment]
+        : undefined,
+      tabStops: options?.tabStop
+        ? [
+            {
+              type: TabStopType.RIGHT,
+              position: TabStopPosition.MAX,
+            },
+          ]
+        : undefined,
+    },
+  );
 }
 
 /**
  * Create a divider (horizontal rule) paragraph.
  */
 export function dividerParagraph(): Paragraph {
-  return new Paragraph({
-    spacing: { before: 70, after: 120 },
-    border: {
-      bottom: {
-        color: "000000",
-        space: 1,
-        style: BorderStyle.SINGLE,
-        size: 4,
+  return trackParagraph(
+    new Paragraph({
+      spacing: { before: 70, after: 120 },
+      border: {
+        bottom: {
+          color: "000000",
+          space: 1,
+          style: BorderStyle.SINGLE,
+          size: 4,
+        },
+      },
+    }),
+    {
+      spacing: { before: 70, after: 120 },
+      border: {
+        bottom: {
+          color: "000000",
+          space: 1,
+          style: BorderStyle.SINGLE,
+          size: 4,
+        },
       },
     },
-  });
+  );
 }
 
 /**
  * Create a spacer paragraph with configurable height.
  */
 export function spacerParagraph(points: number = 60): Paragraph {
-  return new Paragraph({
-    spacing: { after: points },
-    children: [],
-  });
+  return trackParagraph(
+    new Paragraph({ spacing: { after: points }, children: [] }),
+    { spacing: { after: points }, children: [] },
+  );
 }
 
 /**
@@ -188,6 +285,7 @@ export function createBulletNumbering() {
 }
 
 export {
+  trackParagraph,
   Paragraph,
   TextRun,
   Document,

@@ -4,6 +4,7 @@ import {
   dividerParagraph,
   spacerParagraph,
   getStyles,
+  withSpacingAfter,
   BULLET_NUMBERING,
 } from "../core/index.js";
 
@@ -12,6 +13,7 @@ import {
  *
  * @param text - The heading text.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the paragraph.
  * @returns A section component producing a heading paragraph.
  *
  * @example
@@ -22,8 +24,13 @@ import {
 export function Heading(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).heading, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).heading, text)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -36,8 +43,13 @@ export function Heading(
 export function SubHeading(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).subHeading, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).subHeading, text)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -50,8 +62,13 @@ export function SubHeading(
 export function SectionHeading(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).sectionHeading, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).sectionHeading, text)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -64,8 +81,13 @@ export function SectionHeading(
 export function Text(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).text, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).text, text)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -78,8 +100,13 @@ export function Text(
 export function SmallText(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).smallText, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).smallText, text)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -92,12 +119,17 @@ export function SmallText(
 export function Bullet(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [
-    paragraphFromToken(getStyles(styles).bullet, text, {
-      numbering: { reference: BULLET_NUMBERING, level: 0 },
-    }),
-  ];
+  return () =>
+    withSpacingAfter(
+      [
+        paragraphFromToken(getStyles(styles).bullet, text, {
+          numbering: { reference: BULLET_NUMBERING, level: 0 },
+        }),
+      ],
+      spacingAfter,
+    );
 }
 
 /**
@@ -110,6 +142,7 @@ export function Bullet(
 export function BulletList(
   items: Array<string | SectionComponent>,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
@@ -127,7 +160,7 @@ export function BulletList(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -136,8 +169,8 @@ export function BulletList(
  *
  * @returns A section component producing a divider paragraph.
  */
-export function Divider(): SectionComponent {
-  return () => [dividerParagraph()];
+export function Divider(spacingAfter?: number): SectionComponent {
+  return () => withSpacingAfter([dividerParagraph()], spacingAfter);
 }
 
 /**
@@ -146,6 +179,9 @@ export function Divider(): SectionComponent {
  * @param points - Space in twips (default 60).
  * @returns A section component producing a spacer paragraph.
  */
-export function Spacer(points?: number): SectionComponent {
-  return () => [spacerParagraph(points)];
+export function Spacer(
+  points?: number,
+  spacingAfter?: number,
+): SectionComponent {
+  return () => withSpacingAfter([spacerParagraph(points)], spacingAfter);
 }

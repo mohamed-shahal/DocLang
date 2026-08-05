@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   LanguageConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Paragraph, TextRun } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, withSpacingAfter, splitSpacingAfter, trackParagraph, Paragraph, TextRun } from "../core/index.js";
 
 /**
  * A languages section containing multiple language entries.
@@ -20,12 +20,13 @@ import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Parag
  * ```
  */
 export function Languages(
-  ...items: Array<SectionComponent | string>
+  ...items: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items: children, spacingAfter } = splitSpacingAfter(items);
     const paragraphs: Paragraph[] = [];
 
-    for (const item of items) {
+    for (const item of children) {
       if (typeof item === "string") {
         paragraphs.push(...Text(item)());
       } else {
@@ -33,7 +34,7 @@ export function Languages(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -42,29 +43,36 @@ export function Languages(
  *
  * @param config - Language configuration.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the entry.
  * @returns A section component producing a language paragraph.
  */
 export function Language(
   config: LanguageConfig,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
 
     if (config.proficiency) {
-      return [
-        new Paragraph({
-          children: [
-            textRunFromToken(s.company, config.name),
-            new TextRun({ text: " — ", font: s.text.font, size: s.text.size, color: s.text.color }),
-            textRunFromToken(s.text, config.proficiency),
-          ],
-          spacing: s.skill.spacing,
-        }),
-      ];
+      const options = {
+        children: [
+          textRunFromToken(s.company, config.name),
+          new TextRun({ text: " — ", font: s.text.font, size: s.text.size, color: s.text.color }),
+          textRunFromToken(s.text, config.proficiency),
+        ],
+        spacing: s.skill.spacing,
+      };
+      return withSpacingAfter(
+        [trackParagraph(new Paragraph(options), options)],
+        spacingAfter,
+      );
     }
 
-    return [paragraphFromToken(s.company, config.name)];
+    return withSpacingAfter(
+      [paragraphFromToken(s.company, config.name)],
+      spacingAfter,
+    );
   };
 }
 

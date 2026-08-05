@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   EducationItemConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, getStyles, Paragraph } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, getStyles, withSpacingAfter, splitSpacingAfter, Paragraph } from "../core/index.js";
 
 /**
  * An education section containing multiple education items.
@@ -23,12 +23,13 @@ import { paragraphFromToken, inlineParagraph, getStyles, Paragraph } from "../co
  * ```
  */
 export function Education(
-  ...items: Array<SectionComponent | string>
+  ...items: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items: children, spacingAfter } = splitSpacingAfter(items);
     const paragraphs: Paragraph[] = [];
 
-    for (const item of items) {
+    for (const item of children) {
       if (typeof item === "string") {
         paragraphs.push(...Text(item)());
       } else {
@@ -36,7 +37,7 @@ export function Education(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -50,6 +51,7 @@ export function Education(
 export function EducationItem(
   config: EducationItemConfig,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
@@ -69,7 +71,7 @@ export function EducationItem(
       ),
     );
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -78,13 +80,19 @@ export function EducationItem(
  *
  * @param name - Institution name.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the paragraph.
  * @returns A section component producing an institution paragraph.
  */
 export function Institution(
   name: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).company, name)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).company, name)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -92,13 +100,19 @@ export function Institution(
  *
  * @param name - Degree name.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the paragraph.
  * @returns A section component producing a degree paragraph.
  */
 export function Degree(
   name: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).designation, name)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).designation, name)],
+      spacingAfter,
+    );
 }
 
 // Re-use Text from generic for string fallback

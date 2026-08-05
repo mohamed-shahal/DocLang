@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   ProjectConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Paragraph, TextRun, BULLET_NUMBERING } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, withSpacingAfter, splitSpacingAfter, Paragraph, TextRun, BULLET_NUMBERING } from "../core/index.js";
 
 /**
  * A projects section containing multiple project entries.
@@ -23,12 +23,13 @@ import { paragraphFromToken, inlineParagraph, textRunFromToken, getStyles, Parag
  * ```
  */
 export function Projects(
-  ...items: Array<SectionComponent | string>
+  ...items: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items: children, spacingAfter } = splitSpacingAfter(items);
     const paragraphs: Paragraph[] = [];
 
-    for (const item of items) {
+    for (const item of children) {
       if (typeof item === "string") {
         paragraphs.push(...Text(item)());
       } else {
@@ -36,7 +37,7 @@ export function Projects(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -45,11 +46,13 @@ export function Projects(
  *
  * @param config - Project configuration.
  * @param styles - Optional style overrides.
+ * @param spacingAfter - Optional extra space (in twips) after the entry.
  * @returns A section component producing paragraphs for one project entry.
  */
 export function Project(
   config: ProjectConfig,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
@@ -74,7 +77,7 @@ export function Project(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 

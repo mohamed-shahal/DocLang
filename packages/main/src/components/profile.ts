@@ -1,5 +1,5 @@
 import type { SectionComponent, ResumeStyles } from "../types/index.js";
-import { paragraphFromToken, getStyles } from "../core/index.js";
+import { paragraphFromToken, getStyles, withSpacingAfter } from "../core/index.js";
 
 /**
  * A professional summary paragraph.
@@ -16,8 +16,13 @@ import { paragraphFromToken, getStyles } from "../core/index.js";
 export function Summary(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).text, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).text, text)],
+      spacingAfter,
+    );
 }
 
 /**
@@ -30,6 +35,11 @@ export function Summary(
 export function Objective(
   text: string,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
-  return () => [paragraphFromToken(getStyles(styles).text, text)];
+  return () =>
+    withSpacingAfter(
+      [paragraphFromToken(getStyles(styles).text, text)],
+      spacingAfter,
+    );
 }

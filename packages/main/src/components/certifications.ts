@@ -3,7 +3,7 @@ import type {
   ResumeStyles,
   CertificationConfig,
 } from "../types/index.js";
-import { paragraphFromToken, inlineParagraph, getStyles, Paragraph } from "../core/index.js";
+import { paragraphFromToken, inlineParagraph, getStyles, withSpacingAfter, splitSpacingAfter, Paragraph } from "../core/index.js";
 
 /**
  * A certifications section containing multiple certification entries.
@@ -19,12 +19,13 @@ import { paragraphFromToken, inlineParagraph, getStyles, Paragraph } from "../co
  * ```
  */
 export function Certifications(
-  ...items: Array<SectionComponent | string>
+  ...items: Array<SectionComponent | string | number>
 ): SectionComponent {
   return () => {
+    const { items: children, spacingAfter } = splitSpacingAfter(items);
     const paragraphs: Paragraph[] = [];
 
-    for (const item of items) {
+    for (const item of children) {
       if (typeof item === "string") {
         paragraphs.push(...Text(item)());
       } else {
@@ -32,7 +33,7 @@ export function Certifications(
       }
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
@@ -46,6 +47,7 @@ export function Certifications(
 export function Certification(
   config: CertificationConfig,
   styles?: ResumeStyles,
+  spacingAfter?: number,
 ): SectionComponent {
   return () => {
     const s = getStyles(styles);
@@ -67,7 +69,7 @@ export function Certification(
       paragraphs.push(paragraphFromToken(s.company, config.name));
     }
 
-    return paragraphs;
+    return withSpacingAfter(paragraphs, spacingAfter);
   };
 }
 
