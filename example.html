@@ -85,10 +85,7 @@
                     )
                 );
 
-                const buffer = await Packer.toBuffer(resume);
-                const blob = new Blob([buffer], { 
-                    type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document" 
-                });
+                const blob = await Packer.toBlob(resume);
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;

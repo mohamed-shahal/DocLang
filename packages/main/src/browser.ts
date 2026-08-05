@@ -1,5 +1,14 @@
 // Browser-compatible exports (no Node.js-specific utilities)
+import { Packer } from "docx";
+
 export { defaultStyles, createStyles } from "./styles/index.js";
+
+// Packer for packing documents in the browser, exposed both directly and as
+// DocLang.docx.Packer (matching the documented CDN usage).
+export { Packer };
+export const docx = { Packer };
+
+export { exportFile } from "./utils/export-browser.js";
 
 export type { ResumeStyles, StyleToken } from "./types/index.js";
 
