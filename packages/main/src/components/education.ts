@@ -65,9 +65,9 @@ export function EducationItem(
       inlineParagraph(
         [
           { token: s.company, text: config.institution },
-          { token: s.duration, text: config.year },
+          { token: s.duration, text: ` — ${config.year}` },
         ],
-        { tabStop: true, spacing: { before: 0, after: 20, line: 240 } },
+        { spacing: s.company.spacing },
       ),
     );
 

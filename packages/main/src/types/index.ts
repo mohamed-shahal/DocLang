@@ -58,7 +58,7 @@ export interface ImageConfig {
   width: number;
   height: number;
   /**
-   * Paragraph alignment. Defaults to "right".
+   * Paragraph alignment. Defaults to "left".
    */
   alignment?: "left" | "center" | "right";
   /**

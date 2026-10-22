@@ -33,6 +33,7 @@ export {
   Bullet,
   BulletList,
   Divider,
+  PageBreak,
   Spacer,
 } from "./components/generic.js";
 

@@ -10,18 +10,31 @@
     ".": {
       "import": "./packages/main/dist/index.js",
       "types": "./packages/main/dist/index.d.ts"
+    },
+    "./browser": {
+      "import": "./packages/main/dist/browser.js",
+      "types": "./packages/main/dist/browser.d.ts"
+    },
+    "./browser": {
+      "types": "./packages/main/dist/browser.d.ts",
+      "import": "./packages/main/dist/browser.js"
     }
   },
-  "files": [
-    "packages/main/dist"
-  ],
   "scripts": {
     "build": "tsc",
-    "build:browser": "esbuild packages/main/src/browser.ts --bundle --minify --outfile=packages/main/dist/doclang.min.js --global-name=DocLang --format=iife",
-    "build:all": "npm run build && npm run build:browser",
     "test": "vitest run",
-    "test:watch": "vitest",
-    "lint": "tsc --noEmit"
+    "lint": "tsc --noEmit",
+    "build:browser": "esbuild packages/main/src/browser.ts --bundle --minify --outfile=packages/main/dist/doclang.min.js --global-name=DocLang --format=iife",
+    "build:all": "pnpm build && pnpm build:browser",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "docx": "^9.1.0"
+  },
+  "devDependencies": {
+    "esbuild": "^0.24.2",
+    "typescript": "^5.7.0",
+    "vitest": "^3.0.0"
   },
   "keywords": [
     "resume",
@@ -30,13 +43,8 @@
     "document",
     "typescript"
   ],
-  "license": "MIT",
-  "dependencies": {
-    "docx": "^9.1.0"
-  },
-  "devDependencies": {
-    "esbuild": "^0.24.2",
-    "typescript": "^5.7.0",
-    "vitest": "^3.0.0"
-  }
+  "files": [
+    "packages/main/dist"
+  ],
+  "license": "MIT"
 }

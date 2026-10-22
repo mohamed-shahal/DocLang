@@ -1,6 +1,17 @@
 # DocLang
 
-A TypeScript library for creating professional Microsoft Word resumes using semantic components.
+DocLang is a TypeScript library for building Microsoft Word resumes from reusable components. Compose a document from semantic sections, customize typography with style tokens, and export a `.docx` file from Node.js or a browser.
+
+## Contents
+
+- [Install](#install)
+- [Quick start](#quick-start)
+- [Pages and layout](#pages-and-layout)
+- [Styling](#styling)
+- [Browser use](#browser-use)
+- [Components](#components)
+- [Reference and examples](#reference-and-examples)
+- [Development](#development)
 
 ## Install
 
@@ -10,22 +21,11 @@ npm install doclang
 pnpm add doclang
 ```
 
-## CDN Usage
+DocLang targets Node.js and modern browsers and is distributed as an ES module. TypeScript declarations are included. The `docx` package is installed as a runtime dependency.
 
-After publishing to npm, you can import directly from a CDN:
+## Quick start
 
-```js
-import { Resume, Header, Name, Summary, exportFile } from "https://esm.sh/doclang";
-import { Packer } from "https://esm.sh/docx";
-```
-
-Available CDN services:
-
-- **esm.sh**: `https://esm.sh/doclang`
-- **unpkg**: `https://unpkg.com/doclang`
-- **jsDelivr**: `https://cdn.jsdelivr.net/npm/doclang`
-
-## Quick Start
+Create a file such as `resume.ts`:
 
 ```ts
 import {
@@ -34,6 +34,7 @@ import {
   Name,
   Designation,
   Contact,
+  SectionHeading,
   Summary,
   Experience,
   ExperienceItem,
@@ -46,228 +47,165 @@ import {
 
 const resume = Resume(
   Header(
-    Name("John Doe"),
-    Designation("Software Engineer"),
+    Name("Jordan Lee"),
+    Designation("Senior Software Engineer"),
     Contact({
-      email: "john@example.com",
-      phone: "+91xxxxxxxxxx",
-    })
+      email: "jordan.lee@example.com",
+      phone: "+1 555 010 2040",
+      location: "Seattle, WA",
+      linkedin: "linkedin.com/in/jordanlee",
+    }),
   ),
-
+  SectionHeading("Professional Summary"),
   Summary(
-    "Passionate software engineer with experience building scalable applications."
+    "Software engineer with 8+ years of experience delivering cloud services, " +
+      "improving platform reliability, and mentoring cross-functional teams.",
   ),
-
+  SectionHeading("Experience"),
   Experience(
     ExperienceItem({
-      company: "ABC Technologies",
-      designation: "Frontend Developer",
-      duration: "2023 - Present",
+      company: "Northstar Systems",
+      designation: "Senior Software Engineer",
+      duration: "2021–Present",
       points: [
-        "Developed React applications",
-        "Improved application performance",
+        "Led migration of 12 services to AWS, reducing infrastructure costs by 28%.",
+        "Improved API p95 latency by 35% through profiling, caching, and query optimization.",
       ],
-    })
+    }),
   ),
-
+  SectionHeading("Technical Skills"),
   Skills(
     Skill("TypeScript"),
-    Skill("React"),
-    Skill("Node.js")
+    Skill("Node.js"),
+    Skill("AWS"),
+    Skill("PostgreSQL"),
   ),
-
+  SectionHeading("Education"),
   Education(
     EducationItem({
-      degree: "B.Tech Computer Science",
-      institution: "XYZ University",
-      year: "2023",
-    })
-  )
+      degree: "B.S. Computer Science",
+      institution: "University of Washington",
+      year: "2016",
+    }),
+  ),
 );
 
-// Save as DOCX
-await exportFile(resume, { fileName: "john_doe" });
-
-// Save as DOCX + PDF (requires LibreOffice)
-await exportFile(resume, { fileName: "john_doe", pdf: true });
+const result = await exportFile(resume, {
+  outputDir: "./exports",
+  fileName: "jordan-lee-resume",
+});
+console.log(`Created ${result.docx}`);
 ```
 
-## Components
+Run the TypeScript file with your preferred TypeScript runtime, or compile it with TypeScript. `exportFile` writes `./exports/jordan-lee-resume.docx` in Node.js.
 
-### Root
+To also create a PDF from Node.js, pass `pdf: true`; LibreOffice must be installed and available as `soffice` on `PATH`:
 
-| Component | Description |
-|-----------|-------------|
-| `Resume(...sections)` | Assembles all sections into a `docx.Document` |
+```ts
+await exportFile(resume, { fileName: "jordan-lee-resume", pdf: true });
+```
 
-### Generic
+## Pages and layout
 
-| Component | Description |
-|-----------|-------------|
-| `Heading(text)` | Large heading paragraph |
-| `SubHeading(text)` | Sub-heading paragraph |
-| `SectionHeading(text)` | Section heading with accent color |
-| `Text(text)` | Normal text paragraph |
-| `SmallText(text)` | Small secondary text |
-| `Bullet(text)` | Single bullet point |
-| `BulletList(items)` | Multiple bullet points |
-| `Divider()` | Horizontal divider line |
-| `Spacer(points?)` | Vertical spacing |
+`Resume(...sections)` assembles components into a `docx.Document`. Documents use US Letter paper with 0.7-inch top/bottom margins and 0.85-inch left/right margins. Text and component defaults are black and left-aligned. Word naturally flows content onto additional pages; insert `PageBreak()` where a deliberate page boundary is needed:
 
-### Header
+```ts
+import { Resume, Header, Name, PageBreak, SectionHeading, Projects, Project } from "doclang";
 
-| Component | Description |
-|-----------|-------------|
-| `Header(...children)` | Container for header content |
-| `Name(text)` | Candidate name (large, centered) |
-| `Designation(text)` | Professional title |
-| `Contact(info)` | Contact line with pipe separators |
-| `Address(text)` | Address in small text |
-| `Photo(config)` | Photo image |
-| `PhotoPath(imagePath, config)` | Photo image loaded from a local file path |
+const resume = Resume(
+  Header(Name("Jordan Lee")),
+  SectionHeading("Experience"),
+  // Experience(...),
+  PageBreak(),
+  SectionHeading("Selected Projects"),
+  Projects(
+    Project({ name: "Platform modernization", description: "Migrated services to AWS." }),
+  ),
+);
+```
 
-### Profile
-
-| Component | Description |
-|-----------|-------------|
-| `Summary(text)` | Professional summary |
-| `Objective(text)` | Career objective |
-
-### Experience
-
-| Component | Description |
-|-----------|-------------|
-| `Experience(...items)` | Container for experience entries |
-| `ExperienceItem(config)` | Entry with company, designation, duration, points |
-| `Company(name)` | Company name standalone |
-| `Duration(text)` | Duration standalone |
-
-### Education
-
-| Component | Description |
-|-----------|-------------|
-| `Education(...items)` | Container for education entries |
-| `EducationItem(config)` | Entry with degree, institution, year |
-| `Institution(name)` | Institution name standalone |
-| `Degree(name)` | Degree name standalone |
-
-### Skills
-
-| Component | Description |
-|-----------|-------------|
-| `Skills(...items)` | Container for skills |
-| `Skill(name)` | Single skill item |
-
-### Projects
-
-| Component | Description |
-|-----------|-------------|
-| `Projects(...items)` | Container for projects |
-| `Project(config)` | Entry with name, description, points |
-
-### Certifications
-
-| Component | Description |
-|-----------|-------------|
-| `Certifications(...items)` | Container for certifications |
-| `Certification(config)` | Entry with name, issuer, date |
-
-### Languages
-
-| Component | Description |
-|-----------|-------------|
-| `Languages(...items)` | Container for languages |
-| `Language(config)` | Entry with name, proficiency |
-
-### Awards
-
-| Component | Description |
-|-----------|-------------|
-| `Awards(...items)` | Container for awards |
-| `Award(config)` | Entry with title, date, issuer |
-
-### References
-
-| Component | Description |
-|-----------|-------------|
-| `References(...items)` | Container for references |
-| `Reference(config)` | Entry with name, title, company, email, phone |
+Every component is left-aligned by default. A component style can explicitly set `alignment: "center"` or `"right"` when a different layout is desired.
 
 ## Styling
 
-All typography is centralized in a style system. Override any token via `createStyles`:
+The default design uses Arial, black text, left alignment, readable spacing, and restrained section rules. `createStyles` starts with these defaults and applies only the overrides you provide. Pass the resulting style object to each component you want to customize:
 
 ```ts
-import { createStyles, Resume, Header, Name } from "doclang";
+import { createStyles, Header, Name, Designation } from "doclang";
 
-const customStyles = createStyles({
-  heading: { color: "FF0000", size: 32 },
-  name: { font: "Georgia" },
+const resumeStyles = createStyles({
+  name: { font: "Georgia", size: 38 },
+  sectionHeading: {
+    size: 24,
+    spacing: { before: 240 },
+  },
 });
 
-const resume = Resume(
-  Header(Name("John Doe", customStyles)),
-  // ...
+Header(
+  Name("Jordan Lee", resumeStyles),
+  Designation("Senior Software Engineer", resumeStyles),
 );
 ```
 
-### Style Tokens
+Sizes are in half-points (`24` means 12 pt). Colors are six-digit hexadecimal strings without `#`. Spacing values are in twips (`20` twips = 1 point). Nested `spacing` and `border` overrides are merged with the defaults.
 
-| Token | Used By |
-|-------|---------|
-| `heading` | `Heading` |
-| `subHeading` | `SubHeading` |
-| `sectionHeading` | `SectionHeading` |
-| `name` | `Name` |
-| `designation` | `Designation`, `ExperienceItem`, `EducationItem` |
-| `text` | `Text`, `Summary`, `Objective` |
-| `smallText` | `SmallText`, `Address` |
-| `bullet` | `Bullet`, `BulletList` |
-| `company` | `Company`, `Institution`, `Skill`, `Project`, `Certification`, `Language`, `Award` |
-| `duration` | `Duration`, experience/education/certification/award dates |
-| `contact` | `Contact` |
-| `skill` | `Skill` |
+Available style tokens include `name`, `designation`, `contact`, `sectionHeading`, `heading`, `subHeading`, `text`, `smallText`, `bullet`, `company`, `duration`, and `skill`. See [REFERENCE.md](./REFERENCE.md#styles-system) for token mappings and component signatures.
 
-## Project Structure
+## Browser use
 
+Use the browser entry point for a bundler-based app:
+
+```ts
+import { Resume, Header, Name, exportFile } from "doclang/browser";
+
+const document = Resume(Header(Name("Jordan Lee")));
+await exportFile(document, { fileName: "jordan-lee-resume" });
 ```
-packages/main/src/
-├── types/index.ts          # TypeScript interfaces
-├── styles/index.ts         # Centralized style tokens
-├── core/index.ts           # Docx primitives
-├── utils/index.ts          # Utility helpers
-├── components/
-│   ├── generic.ts          # Heading, Text, Bullet, Divider, Spacer, etc.
-│   ├── header.ts           # Header, Name, Designation, Contact, etc.
-│   ├── profile.ts          # Summary, Objective
-│   ├── experience.ts       # Experience, ExperienceItem
-│   ├── education.ts        # Education, EducationItem
-│   ├── skills.ts           # Skills, Skill
-│   ├── projects.ts         # Projects, Project
-│   ├── certifications.ts   # Certifications, Certification
-│   ├── languages.ts        # Languages, Language
-│   ├── awards.ts           # Awards, Award
-│   ├── references.ts       # References, Reference
-│   └── resume.ts           # Resume root component
-├── components.test.ts      # Tests
-└── index.ts                # Public exports
-```
+
+In a browser, `exportFile` downloads a DOCX file. Browser export does not support PDF conversion or Node filesystem paths. `PhotoPath` is available only from the Node entry point; for browser images, use `Photo` or `ResumeImage` with image data.
+
+To build a standalone browser bundle from this repository, run `pnpm build:browser`; the generated IIFE is `packages/main/dist/doclang.min.js` and exposes `DocLang` globally. For npm CDN delivery, publish the package first and confirm your CDN serves this generated bundle before using a script tag.
+
+## Components
+
+| Area | Components |
+|---|---|
+| Document | `Resume`, `PageBreak` |
+| Generic text/layout | `Heading`, `SubHeading`, `SectionHeading`, `Text`, `SmallText`, `Bullet`, `BulletList`, `Divider`, `Spacer` |
+| Header | `Header`, `Name`, `Designation`, `Contact`, `Address`, `Photo`, `PhotoPath` (Node only), `ResumeImage` |
+| Profile | `Summary`, `Objective` |
+| Experience | `Experience`, `ExperienceItem`, `Company`, `Duration` |
+| Education | `Education`, `EducationItem`, `Institution`, `Degree` |
+| Skills | `Skills`, `Skill` |
+| Projects | `Projects`, `Project` |
+| Certifications | `Certifications`, `Certification` |
+| Languages | `Languages`, `Language` |
+| Awards | `Awards`, `Award` |
+| References | `References`, `Reference` |
+
+Use `SectionHeading("Experience")` to add a visible section title; containers such as `Experience(...)` group entries but do not add their own heading automatically. Most component details and configuration shapes are documented in the [library reference](./REFERENCE.md).
+
+## Reference and examples
+
+- [Full API reference](./REFERENCE.md)
+- [Multi-page resume example](./examples/sample-resume.ts)
+- [Custom theme example](./examples/modern-theme.ts)
+
+The sample resume uses fictional names and illustrative metrics. Replace them with accurate details before adapting it for real use.
 
 ## Development
 
+This repository is a pnpm project. From the repository root:
+
 ```bash
-# Install dependencies
 pnpm install
-
-# Run tests
-pnpm test
-
-# Type check
-pnpm lint
-
-# Build
-pnpm build
+pnpm build          # Compile ESM and TypeScript declarations to packages/main/dist
+pnpm build:browser  # Build the browser IIFE bundle
+pnpm test           # Run Vitest
+pnpm lint           # Type-check without emitting files
 ```
+
+The public Node exports are in `packages/main/src/index.ts`; browser-safe exports are in `packages/main/src/browser.ts`. Component implementation and centralized default styles live under `packages/main/src/components/` and `packages/main/src/styles/`.
 
 ## License
 

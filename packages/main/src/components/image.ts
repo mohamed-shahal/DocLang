@@ -34,7 +34,7 @@ export function detectImageType(
 }
 
 /**
- * A generic image component, right-aligned by default.
+ * A generic image component, left-aligned by default.
  *
  * @param config - Image configuration with data, width, height, optional alignment and side.
  * @returns A section component producing an image paragraph.
@@ -90,7 +90,7 @@ export function ResumeImage(
     return [
       new Paragraph({
         children: [image],
-        alignment: (config.alignment ?? "right") as
+        alignment: (config.alignment ?? "left") as
           | "left"
           | "center"
           | "right",

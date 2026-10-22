@@ -6,11 +6,8 @@ import type {
 import { paragraphFromToken, inlineParagraph, getStyles, withSpacingAfter, splitSpacingAfter, Paragraph, BULLET_NUMBERING } from "../core/index.js";
 
 /**
- * A section heading labeled "Experience".
- *
- * @param label - Optional custom label (default "Experience").
- * @param styles - Optional style overrides.
- * @returns A section component producing a section heading.
+ * A container that groups experience entries without adding a heading.
+ * Add `SectionHeading("Experience")` separately when a visible heading is needed.
  */
 export function Experience(
   ...items: Array<SectionComponent | string | number>
@@ -65,9 +62,9 @@ export function ExperienceItem(
       inlineParagraph(
         [
           { token: s.company, text: config.company },
-          { token: s.duration, text: config.duration },
+          { token: s.duration, text: ` — ${config.duration}` },
         ],
-        { tabStop: true, spacing: { before: 0, after: 20, line: 240 } },
+        { spacing: s.company.spacing },
       ),
     );
 

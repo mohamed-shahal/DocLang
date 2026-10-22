@@ -2,6 +2,7 @@ import type { ResumeStyles, StyleToken, SectionComponent } from "../types/index.
 import { defaultStyles } from "../styles/index.js";
 import {
   Paragraph,
+  PageBreak as DocxPageBreak,
   TextRun,
   Document,
   AlignmentType,
@@ -112,6 +113,7 @@ export function paragraphFromToken(
     alignment?: StyleToken["alignment"];
     bullet?: boolean;
     numbering?: { reference: string; level: number };
+    keepNext?: boolean;
   },
 ): Paragraph {
   const alignmentMap: Record<string, (typeof AlignmentType)[keyof typeof AlignmentType]> = {
@@ -138,6 +140,7 @@ export function paragraphFromToken(
       spacing: token.spacing,
       alignment: alignmentMap[options?.alignment ?? token.alignment ?? "left"],
       numbering: options?.numbering,
+      keepNext: options?.keepNext,
       border: Object.keys(borderConfig).length > 0 ? borderConfig : undefined,
     }),
     {
@@ -145,6 +148,7 @@ export function paragraphFromToken(
       spacing: token.spacing,
       alignment: alignmentMap[options?.alignment ?? token.alignment ?? "left"],
       numbering: options?.numbering,
+      keepNext: options?.keepNext,
       border: Object.keys(borderConfig).length > 0 ? borderConfig : undefined,
     },
   );
@@ -218,9 +222,9 @@ export function dividerParagraph(): Paragraph {
       border: {
         bottom: {
           color: "000000",
-          space: 1,
+          space: 2,
           style: BorderStyle.SINGLE,
-          size: 4,
+          size: 5,
         },
       },
     }),
@@ -229,9 +233,9 @@ export function dividerParagraph(): Paragraph {
       border: {
         bottom: {
           color: "000000",
-          space: 1,
+          space: 2,
           style: BorderStyle.SINGLE,
-          size: 4,
+          size: 5,
         },
       },
     },
@@ -287,6 +291,7 @@ export function createBulletNumbering() {
 export {
   trackParagraph,
   Paragraph,
+  DocxPageBreak as PageBreakRun,
   TextRun,
   Document,
   AlignmentType,

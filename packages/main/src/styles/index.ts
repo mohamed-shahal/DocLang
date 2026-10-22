@@ -7,37 +7,39 @@ import type { ResumeStyles } from "../types/index.js";
 export const defaultStyles: ResumeStyles = {
   name: {
     font: "Arial",
-    size: 40,
+    size: 52,
     bold: true,
     color: "000000",
-    spacing: { before: 0, after: 40, line: 240 },
+    alignment: "left",
+    spacing: { before: 0, after: 30, line: 280 },
   },
   designation: {
     font: "Arial",
-    size: 22,
-    bold: true,
-    color: "333333",
-    spacing: { before: 0, after: 30, line: 240 },
+    size: 23,
+    color: "000000",
+    alignment: "left",
+    spacing: { before: 0, after: 55, line: 260 },
   },
   contact: {
     font: "Arial",
     size: 18,
-    color: "333333",
-    spacing: { before: 0, after: 80, line: 240 },
+    color: "000000",
+    alignment: "left",
+    spacing: { before: 0, after: 150, line: 250 },
   },
   sectionHeading: {
     font: "Arial",
-    size: 21,
+    size: 22,
     bold: true,
     uppercase: true,
     color: "000000",
-    spacing: { before: 200, after: 50, line: 240 },
+    spacing: { before: 190, after: 70, line: 260 },
     border: {
       bottom: {
         style: "single",
-        size: 6,
+        size: 8,
         color: "000000",
-        space: 2,
+        space: 3,
       },
     },
   },
@@ -45,52 +47,53 @@ export const defaultStyles: ResumeStyles = {
     font: "Arial",
     size: 20,
     color: "000000",
-    spacing: { before: 0, after: 50, line: 240 },
+    spacing: { before: 0, after: 75, line: 270 },
   },
   smallText: {
     font: "Arial",
-    size: 18,
-    color: "555555",
-    spacing: { before: 0, after: 20, line: 240 },
+    size: 17,
+    color: "000000",
+    spacing: { before: 0, after: 35, line: 250 },
   },
   bullet: {
     font: "Arial",
     size: 20,
     color: "000000",
-    spacing: { before: 0, after: 40, line: 240 },
+    spacing: { before: 0, after: 42, line: 260 },
   },
   company: {
     font: "Arial",
     size: 20,
-    bold: false,
+    bold: true,
     color: "000000",
-    spacing: { before: 0, after: 30, line: 240 },
+    spacing: { before: 0, after: 55, line: 260 },
   },
   duration: {
     font: "Arial",
-    size: 18,
-    color: "555555",
-    spacing: { before: 0, after: 0, line: 240 },
+    size: 17,
+    italics: true,
+    color: "000000",
+    spacing: { before: 0, after: 0, line: 250 },
   },
   heading: {
     font: "Arial",
-    size: 24,
+    size: 30,
     bold: true,
     color: "000000",
-    spacing: { before: 0, after: 60, line: 240 },
+    spacing: { before: 0, after: 90, line: 300 },
   },
   subHeading: {
     font: "Arial",
-    size: 21,
+    size: 23,
     bold: true,
-    color: "333333",
-    spacing: { before: 100, after: 30, line: 240 },
+    color: "000000",
+    spacing: { before: 120, after: 55, line: 270 },
   },
   skill: {
     font: "Arial",
     size: 20,
     color: "000000",
-    spacing: { before: 0, after: 30, line: 240 },
+    spacing: { before: 0, after: 45, line: 260 },
   },
 };
 
@@ -115,7 +118,24 @@ export function createStyles(
 
   for (const key of Object.keys(overrides) as Array<keyof ResumeStyles>) {
     if (overrides[key]) {
-      merged[key] = { ...merged[key], ...overrides[key] };
+      const base = merged[key];
+      const override = overrides[key]!;
+      merged[key] = {
+        ...base,
+        ...override,
+        spacing: override.spacing
+          ? { ...base.spacing, ...override.spacing }
+          : base.spacing,
+        border: override.border
+          ? {
+              ...base.border,
+              ...override.border,
+              bottom: override.border.bottom
+                ? { ...base.border?.bottom, ...override.border.bottom }
+                : base.border?.bottom,
+            }
+          : base.border,
+      };
     }
   }
 

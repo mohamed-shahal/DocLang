@@ -48,7 +48,7 @@ export function Resume(
         document: {
           run: {
             font: "Arial",
-            size: 18,
+            size: 20,
             color: "000000",
           },
         },
@@ -58,11 +58,15 @@ export function Resume(
       {
         properties: {
           page: {
+            size: {
+              width: convertInchesToTwip(8.5),
+              height: convertInchesToTwip(11),
+            },
             margin: {
-              top: convertInchesToTwip(0.8),
-              bottom: convertInchesToTwip(0.8),
-              left: convertInchesToTwip(1),
-              right: convertInchesToTwip(1),
+              top: convertInchesToTwip(0.7),
+              bottom: convertInchesToTwip(0.7),
+              left: convertInchesToTwip(0.85),
+              right: convertInchesToTwip(0.85),
             },
           },
         },

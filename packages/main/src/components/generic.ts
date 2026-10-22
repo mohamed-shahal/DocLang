@@ -3,6 +3,8 @@ import {
   paragraphFromToken,
   dividerParagraph,
   spacerParagraph,
+  Paragraph,
+  PageBreakRun,
   getStyles,
   withSpacingAfter,
   BULLET_NUMBERING,
@@ -53,7 +55,7 @@ export function SubHeading(
 }
 
 /**
- * A section heading paragraph with a distinctive accent color.
+ * An uppercase section heading paragraph with a bottom rule (black by default).
  *
  * @param text - The section heading text.
  * @param styles - Optional style overrides.
@@ -66,7 +68,7 @@ export function SectionHeading(
 ): SectionComponent {
   return () =>
     withSpacingAfter(
-      [paragraphFromToken(getStyles(styles).sectionHeading, text)],
+      [paragraphFromToken(getStyles(styles).sectionHeading, text, { keepNext: true })],
       spacingAfter,
     );
 }
@@ -171,6 +173,11 @@ export function BulletList(
  */
 export function Divider(spacingAfter?: number): SectionComponent {
   return () => withSpacingAfter([dividerParagraph()], spacingAfter);
+}
+
+/** Start the next component on a new page. */
+export function PageBreak(): SectionComponent {
+  return () => [new Paragraph({ children: [new PageBreakRun()] })];
 }
 
 /**

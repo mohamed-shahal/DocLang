@@ -2,6 +2,8 @@
 
 A TypeScript library for creating professional Microsoft Word resumes using semantic components.
 
+By default, text is black and left-aligned, using Arial. Documents use US Letter paper with 0.7-inch top/bottom and 0.85-inch left/right margins. Styles can be customized per component with `createStyles`.
+
 ---
 
 ## Table of Contents
@@ -31,26 +33,26 @@ A TypeScript library for creating professional Microsoft Word resumes using sema
 ## Installation
 
 ```bash
-npm install doclang docx
+npm install doclang
 # or
-pnpm add doclang docx
+pnpm add doclang
 ```
 
-`docx` is a peer dependency used for packing the final document.
+`docx` is installed as a runtime dependency of DocLang. You only need to add it directly if your application imports `Packer` or other `docx` APIs itself.
 
 ---
 
 ## CDN Usage
 
 ```html
-<script src="https://unpkg.com/doclang/dist/doclang.min.js"></script>
+<script src="https://unpkg.com/doclang/packages/main/dist/doclang.min.js"></script>
 <script>
   const { Resume, Header, Name } = DocLang;
-  const { Packer } = DocLang.docx;
+  // exportFile downloads a .docx in the browser.
 </script>
 ```
 
-See [README.md](./README.md) for full CDN setup instructions.
+The standalone IIFE bundle is produced by `pnpm build:browser` at `packages/main/dist/doclang.min.js`. It is included in the package after building and exposes the `DocLang` global. Browser `exportFile` downloads a DOCX; it does not write to disk or convert to PDF. `PhotoPath` is Node-only; use image data with `Photo` or `ResumeImage` in the browser.
 
 ---
 
@@ -99,7 +101,7 @@ const doc = Resume(
 const buffer = await Packer.toBuffer(doc);
 ```
 
-Page margins are set to 0.8in top/bottom and 1in left/right by default.
+Pages use US Letter size with 0.7in top/bottom and 0.85in left/right margins by default.
 
 ---
 
@@ -159,13 +161,25 @@ function SubHeading(text: string, styles?: ResumeStyles, spacingAfter?: number):
 
 ### `SectionHeading(text, styles?, spacingAfter?)`
 
-A section heading with a distinctive accent color. Used automatically by container components like `Experience`, `Education`, etc.
+A left-aligned section heading with uppercase text and a bottom rule. Add it before the section content you want to label.
 
 ```ts
 function SectionHeading(text: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
 ```
 
 **Example:** `SectionHeading("EXPERIENCE")`
+
+---
+
+### `PageBreak()`
+
+Starts the next component on a new page. Use it when a resume needs a deliberate page boundary; other content paginates naturally.
+
+```ts
+function PageBreak(): SectionComponent
+```
+
+**Example:** `Resume(Header(...), Experience(...), PageBreak(), Projects(...))`
 
 ---
 
@@ -279,7 +293,7 @@ Header(
 
 ### `Name(name, styles?, spacingAfter?)`
 
-The candidate's name, displayed prominently (large, centered).
+The candidate's name, displayed prominently and left-aligned by default.
 
 ```ts
 function Name(name: string, styles?: ResumeStyles, spacingAfter?: number): SectionComponent
@@ -381,7 +395,7 @@ PhotoPath("photo.jpg", {
 
 ### `ResumeImage(config, spacingAfter?)`
 
-A generic image paragraph, right-aligned by default. Set `side` to `"left"` or `"right"` to float the image so following text wraps beside it.
+A generic image paragraph, left-aligned by default. Set `side` to `"left"` or `"right"` to float the image so following text wraps beside it.
 
 ```ts
 function ResumeImage(config: ImageConfig, spacingAfter?: number): SectionComponent
@@ -449,7 +463,7 @@ Objective(
 
 ### `Experience(...items, spacingAfter?)`
 
-Container for experience entries. Renders a section heading labeled "Experience".
+Container for experience entries. Add `SectionHeading("Experience")` separately when you want a visible section title.
 
 ```ts
 function Experience(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -478,7 +492,7 @@ Experience(
 
 ### `ExperienceItem(config, styles?, spacingAfter?)`
 
-A single experience entry. Renders company and duration on one line (duration right-aligned via tab stop), designation below, and bullet points.
+A single experience entry. Renders the company and duration left-aligned on one line, the designation above, and achievement bullets below.
 
 ```ts
 function ExperienceItem(
@@ -525,7 +539,7 @@ function Duration(text: string, styles?: ResumeStyles, spacingAfter?: number): S
 
 ### `Education(...items, spacingAfter?)`
 
-Container for education entries. Renders a section heading labeled "Education".
+Container for education entries. Add `SectionHeading("Education")` separately when you want a visible section title.
 
 ```ts
 function Education(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -552,7 +566,7 @@ Education(
 
 ### `EducationItem(config, styles?, spacingAfter?)`
 
-A single education entry. Renders institution and year on one line (year right-aligned via tab stop), degree below.
+A single education entry. Renders the institution and year left-aligned on one line, with the degree above.
 
 ```ts
 function EducationItem(
@@ -598,7 +612,7 @@ function Degree(name: string, styles?: ResumeStyles, spacingAfter?: number): Sec
 
 ### `Skills(...skills, spacingAfter?)`
 
-Container for skill items. Renders a section heading labeled "Skills".
+Container for skill items. Add `SectionHeading("Skills")` separately when you want a visible section title.
 
 ```ts
 function Skills(...skills: Array<SectionComponent | string | number>): SectionComponent
@@ -634,7 +648,7 @@ function Skill(name: string, styles?: ResumeStyles, spacingAfter?: number): Sect
 
 ### `Projects(...items, spacingAfter?)`
 
-Container for project entries. Renders a section heading labeled "Projects".
+Container for project entries. Add `SectionHeading("Projects")` separately when you want a visible section title.
 
 ```ts
 function Projects(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -684,7 +698,7 @@ interface ProjectConfig {
 
 ### `Certifications(...items, spacingAfter?)`
 
-Container for certification entries. Renders a section heading labeled "Certifications".
+Container for certification entries. Add `SectionHeading("Certifications")` separately when you want a visible section title.
 
 ```ts
 function Certifications(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -711,7 +725,7 @@ Certifications(
 
 ### `Certification(config, styles?, spacingAfter?)`
 
-A single certification entry. If issuer/date exist, renders the name on the left with "issuer, date" right-aligned via tab stop; otherwise renders just the name.
+A single certification entry. If issuer or date exists, renders the name followed by issuer and date on the same left-aligned line.
 
 ```ts
 function Certification(
@@ -737,7 +751,7 @@ interface CertificationConfig {
 
 ### `Languages(...items, spacingAfter?)`
 
-Container for language entries. Renders a section heading labeled "Languages".
+Container for language entries. Add `SectionHeading("Languages")` separately when you want a visible section title.
 
 ```ts
 function Languages(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -782,7 +796,7 @@ interface LanguageConfig {
 
 ### `Awards(...items, spacingAfter?)`
 
-Container for award entries. Renders a section heading labeled "Awards".
+Container for award entries. Add `SectionHeading("Awards")` separately when you want a visible section title.
 
 ```ts
 function Awards(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -808,7 +822,7 @@ Awards(
 
 ### `Award(config, styles?, spacingAfter?)`
 
-A single award entry. If issuer/date exist, renders the title on the left with "issuer, date" right-aligned via tab stop; otherwise renders just the title.
+A single award entry. If issuer or date exists, renders the title followed by issuer and date on the same left-aligned line.
 
 ```ts
 function Award(
@@ -834,7 +848,7 @@ interface AwardConfig {
 
 ### `References(...items, spacingAfter?)`
 
-Container for reference entries. Renders a section heading labeled "References".
+Container for reference entries. Add `SectionHeading("References")` separately when you want a visible section title.
 
 ```ts
 function References(...items: Array<SectionComponent | string | number>): SectionComponent
@@ -896,6 +910,8 @@ const defaultStyles: ResumeStyles;
 
 Create a merged style configuration from partial overrides. Pass any subset of tokens; unspecified tokens fall back to defaults.
 
+The built-in theme is black and left-aligned. Colors, font families, alignment, spacing, and borders may be overridden per token; the colored theme below is an optional customization example, not the default design.
+
 ```ts
 function createStyles(overrides?: Partial<ResumeStyles>): ResumeStyles;
 ```
@@ -935,9 +951,9 @@ import { createStyles } from "doclang";
 
 export const theme = createStyles({
   // Header
-  name:          { font: "Georgia", size: 40, bold: true, color: "1F4E79", alignment: "center" },
-  designation:   { font: "Georgia", size: 18, color: "444444", alignment: "center" },
-  contact:       { font: "Arial",   size: 16, color: "555555", alignment: "center" },
+  name:          { font: "Georgia", size: 40, bold: true, color: "1F4E79", alignment: "left" },
+  designation:   { font: "Georgia", size: 18, color: "444444", alignment: "left" },
+  contact:       { font: "Arial",   size: 16, color: "555555", alignment: "left" },
   // Sections
   heading:       { font: "Georgia", size: 22, bold: true, color: "1F4E79" },
   subHeading:    { font: "Arial",   size: 18, bold: true, color: "333333" },
@@ -993,7 +1009,7 @@ await exportFile(resume);
 
 - Styles are per-component — pass the theme as the last argument to every component that needs it. There is no global set-once.
 - Export several themes to switch look-and-feel: `export const dark = createStyles({...})`, `export const modern = createStyles({...})`.
-- `createStyles` merges shallowly — nested objects like `spacing` and `border` are replaced wholesale, so override them as complete objects.
+- `createStyles` merges token overrides and merges nested `spacing` and `border` fields with the defaults.
 - With TypeScript, the returned object is already typed as `ResumeStyles`, so you get autocomplete for every token field.
 
 ### Style Tokens
@@ -1031,7 +1047,7 @@ interface StyleToken {
 |-------|---------|
 | `heading` | `Heading` |
 | `subHeading` | `SubHeading` |
-| `sectionHeading` | `SectionHeading`, section containers (`Experience`, `Education`, `Skills`, etc.) |
+| `sectionHeading` | `SectionHeading` |
 | `name` | `Name` |
 | `designation` | `Designation`, `ExperienceItem`, `EducationItem` |
 | `text` | `Text`, `Summary`, `Objective` |
@@ -1282,7 +1298,7 @@ sectionId("experience");
 
 ### `exportFile(document, options?)`
 
-The recommended way to save a DocLang document to disk. Handles DOCX generation, file writing, and optional PDF conversion in a single call. No need to import `Packer`, `fs`, or `child_process`.
+The Node entry point's `exportFile` packs a document, writes the DOCX to disk, and can optionally convert it to PDF. The browser entry point exposes the same function name but downloads a DOCX instead; it does not support `outputDir` or PDF conversion.
 
 ```ts
 async function exportFile(
@@ -1303,8 +1319,8 @@ async function exportFile(
 
 ```ts
 interface ExportResult {
-  docx: string;   // Absolute path to the .docx file
-  pdf?: string;   // Absolute path to the .pdf file (only if pdf: true)
+  docx: string;   // Node: absolute output path. Browser: downloaded filename.
+  pdf?: string;   // Node only: absolute path to the .pdf file (only if pdf: true)
 }
 ```
 

@@ -60,9 +60,9 @@ export function Award(
         inlineParagraph(
           [
             { token: s.company, text: config.title },
-            { token: s.duration, text: rightPart },
+            { token: s.duration, text: ` — ${rightPart}` },
           ],
-          { tabStop: true, spacing: { before: 40, after: 0, line: 276 } },
+          { spacing: s.company.spacing },
         ),
       );
     } else {
