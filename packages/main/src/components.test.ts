@@ -641,6 +641,12 @@ describe("spacingAfter", () => {
     return m ? m[1] : undefined;
   }
 
+  function wrapSquare(xml: string): string {
+    const match = xml.match(/<wp:wrapSquare\b[^>]*\/>/);
+    if (!match) throw new Error("wp:wrapSquare not found");
+    return match[0];
+  }
+
   it("Summary applies spacingAfter to its paragraph", async () => {
     const xml = await documentXml(Resume(Summary("Hello", undefined, 777)));
     expect(pAfter(xml, "Hello")).toBe("777");
@@ -695,5 +701,21 @@ describe("spacingAfter", () => {
   it("default output keeps the token spacing when spacingAfter is omitted", async () => {
     const xml = await documentXml(Resume(Summary("Plain")));
     expect(pAfter(xml, "Plain")).toBe("50");
+  });
+
+  it("leaves a 6 pt text gap on the text-facing side of a floated image", async () => {
+    const png = Buffer.from(
+      "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO1mX2kAAAAASUVORK5CYII=",
+      "base64"
+    );
+    const rightImageXml = await documentXml(
+      Resume(ResumeImage({ data: png, width: 80, height: 80, side: "right" }))
+    );
+    const leftImageXml = await documentXml(
+      Resume(ResumeImage({ data: png, width: 80, height: 80, side: "left" }))
+    );
+
+    expect(wrapSquare(rightImageXml)).toContain('distL="76200"');
+    expect(wrapSquare(leftImageXml)).toContain('distR="76200"');
   });
 });

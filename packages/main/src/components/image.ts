@@ -5,6 +5,9 @@ import {
 } from "../core/index.js";
 import { TextWrappingType } from "docx";
 
+// Six points of breathing room between a floated image and adjacent text.
+const FLOATING_IMAGE_TEXT_GAP = 6 * 12_700;
+
 export function detectImageType(
   data: Buffer,
 ): "png" | "jpg" | "gif" | "bmp" {
@@ -37,7 +40,9 @@ export function detectImageType(
  * A generic image component, left-aligned by default.
  *
  * @param config - Image configuration with data, width, height, optional alignment and side.
+ * @param spacingAfter - Paragraph spacing after the image in twips (defaults to 100, or 5 pt).
  * @returns A section component producing an image paragraph.
+ * Floated images leave a 6 pt gap on the side where text wraps.
  *
  * @example
  * ```ts
@@ -72,6 +77,9 @@ export function ResumeImage(
               ? ("right" as const)
               : ("left" as const),
           },
+          margins: config.side === "left"
+            ? { right: FLOATING_IMAGE_TEXT_GAP }
+            : { left: FLOATING_IMAGE_TEXT_GAP },
         }
       : undefined;
 
